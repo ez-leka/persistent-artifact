@@ -504,9 +504,9 @@ const test = async () => {
     const params = {
         owner: 'ez_leka',
         repo: 'test-on-demand-action-runner',
-        workflow_id: workflow,        
+        //workflow_id: workflow,        
     }
-    const workflows = await client.paginate.iterator(client.actions.listWorkflowRuns, params);
+    const workflows = await client.paginate('GET /repos/{owner}/{repo}/actions/runs', params);
 
     core.info(JSON.stringify(workflows))
     core.info('Done');
