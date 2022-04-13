@@ -20,8 +20,8 @@ const main = async () => {
 
         for await (const runs of client.paginate.iterator(client.rest.actions.listWorkflowRuns,
             {
-                owner: owner,
-                repo: repo,
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
                 workflow_id: workflow,
                 //conclusion: config.inputs.workflowConclusion
             }
