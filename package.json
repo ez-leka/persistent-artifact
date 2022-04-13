@@ -1,0 +1,27 @@
+{
+  "name": "workflow_artifact",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.js",
+  "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "index": "node -r dotenv/config ./src/index.js",
+    "lint": "eslint ./src/*.js",      
+    "package": "ncc build ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ez-leka/workflow_artifact.git"
+  },
+  "author": "Elana Zobin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ez-leka/workflow_artifact/issues"
+  },
+  "homepage": "https://github.com/ez-leka/workflow_artifact#readme"
+}

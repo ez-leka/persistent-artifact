@@ -1,0 +1,14 @@
+name: Exchanging artifacts between workflows
+description: TBD
+author: Elana Zobin
+branding:
+  icon: 'box'
+  color: 'purple'
+inputs:
+  github-token:
+    description: >-
+      GitHub Personal Access Token with the 'repo' scope assigned.
+    required: true
+runs:
+  using: node16
+  main: ./dist/index.js

@@ -2,7 +2,7 @@ github = require('@actions/github');
 core = require('@actions/core');
 
 const test = async () => {
-    const github_token = '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';
+    const github_token = core.getInput('github-token');
     const workflow = 'test-on-demand.yml';
     const artifact_name = 'my-runable';
 
@@ -13,7 +13,7 @@ const test = async () => {
         repo: 'test-on-demand-action-runner',
         workflow_id: workflow,        
     }
-    const workflows = await client.paginate('GET /repos/{owner}/{repo}/actions/runs', params);
+    const workflows = await client.paginate.iterator(client.actions.listWorkflowRuns, params);
 
     core.info(JSON.stringify(workflows))
     core.info('Done');
