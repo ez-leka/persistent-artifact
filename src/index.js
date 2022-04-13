@@ -1,9 +1,6 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
 const config = require('./config');
-const AdmZip = require('adm-zip');
-const filesize = require('filesize');
-const pathname = require('path');
 const fs = require('fs');
 
 const main = async () => {

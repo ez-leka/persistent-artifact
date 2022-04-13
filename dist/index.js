@@ -494,9 +494,6 @@ exports.getOctokit = getOctokit;
 const core = __webpack_require__(171)
 const github = __webpack_require__(127)
 const config = __webpack_require__(673);
-const AdmZip = __webpack_require__(672);
-const filesize = __webpack_require__(845);
-const pathname = __webpack_require__(622);
 const fs = __webpack_require__(747);
 
 const main = async () => {
@@ -5268,14 +5265,6 @@ module.exports = require("util");
 
 /***/ }),
 
-/***/ 672:
-/***/ (function(module) {
-
-module.exports = eval("require")("adm-zip");
-
-
-/***/ }),
-
 /***/ 673:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -6179,14 +6168,6 @@ exports.RequestError = RequestError;
 /***/ (function(module) {
 
 module.exports = require("url");
-
-/***/ }),
-
-/***/ 845:
-/***/ (function(module) {
-
-module.exports = eval("require")("filesize");
-
 
 /***/ }),
 
