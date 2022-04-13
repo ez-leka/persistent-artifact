@@ -5278,7 +5278,7 @@ class Config {
             workflow: core.getInput('workflow'),
             artifactName: core.getInput('artifact-name'),
 
-            path: core.getInput("path", { required: true }),
+            path: core.getInput("path"/*, { required: true }*/),
             workflowConclusion: "success", //core.getInput("workflow_conclusion"),
             runNumber: core.getInput("run_number"),
             checkArtifacts: core.getInput("check_artifacts"),
