@@ -516,40 +516,37 @@ const main = async () => {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 workflow_id: config.inputs.workflow,
-                //conclusion: config.inputs.workflowConclusion
+                conclusion: config.inputs.workflowConclusion
             }
         )) {
             for (const run of runs.data) {
 
                 core.info(`Run Data: ${JSON.stringify(run)}`);
 
-                if (commit && run.head_sha != commit) {
+                if (config.inputs.runNumber && run.run_number != runNumber) {
                     continue;
                 }
-                if (runNumber && run.run_number != runNumber) {
-                    continue;
-                }
-                if (workflowConclusion && (workflowConclusion != run.conclusion && workflowConclusion != run.status)) {
-                    continue;
-                }
-                if (checkArtifacts || searchArtifacts) {
-                    let artifacts = await client.actions.listWorkflowRunArtifacts({
-                        owner: owner,
-                        repo: repo,
-                        run_id: run.id,
-                    })
-                    if (artifacts.data.artifacts.length == 0) {
-                        continue
-                    }
-                    if (searchArtifacts) {
-                        const artifact = artifacts.data.artifacts.find((artifact) => {
-                            return artifact.name == name
-                        })
-                        if (!artifact) {
-                            continue
-                        }
-                    }
-                }
+                // if (workflowConclusion && (workflowConclusion != run.conclusion && workflowConclusion != run.status)) {
+                //     continue;
+                // }
+                // if (checkArtifacts || searchArtifacts) {
+                //     let artifacts = await client.actions.listWorkflowRunArtifacts({
+                //         owner: owner,
+                //         repo: repo,
+                //         run_id: run.id,
+                //     })
+                //     if (artifacts.data.artifacts.length == 0) {
+                //         continue
+                //     }
+                //     if (searchArtifacts) {
+                //         const artifact = artifacts.data.artifacts.find((artifact) => {
+                //             return artifact.name == name
+                //         })
+                //         if (!artifact) {
+                //             continue
+                //         }
+                //     }
+                // }
                 runID = run.id;
                 break;
             }
