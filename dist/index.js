@@ -511,17 +511,18 @@ const main = async () => {
             console.log("==> RunNumber:", config.inputs.runNumber)
         }
 
-        for await (const runs of client.paginate.iterator(client.actions.listWorkflowRuns,
+        for await (const runs of client.paginate.iterator(client.rest.actions.listWorkflowRuns,
             {
                 owner: owner,
                 repo: repo,
-                workflow_id: workflow
+                workflow_id: workflow,
+                //conclusion: config.inputs.workflowConclusion
             }
         )) {
             for (const run of runs.data) {
 
                 core.info(`Run Data: ${JSON.stringify(run)}`);
-                
+
                 if (commit && run.head_sha != commit) {
                     continue;
                 }
