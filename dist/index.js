@@ -515,8 +515,7 @@ const main = async () => {
             {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                workflow_id: config.inputs.workflow,
-                conclusion: config.inputs.workflowConclusion
+                workflow_id: config.inputs.workflow
             }
         )) {
             for (const run of runs.data) {
@@ -526,8 +525,8 @@ const main = async () => {
                 if (config.inputs.runNumber && run.run_number != runNumber) {
                     continue;
                 }
-                // if (workflowConclusion && (workflowConclusion != run.conclusion && workflowConclusion != run.status)) {
-                //     continue;
+                if (config.inputs.workflowConclusion && config.inputs.workflowConclusion != run.conclusion)
+                    continue;
                 // }
                 // if (checkArtifacts || searchArtifacts) {
                 //     let artifacts = await client.actions.listWorkflowRunArtifacts({
