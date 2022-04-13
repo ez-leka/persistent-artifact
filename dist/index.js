@@ -491,29 +491,130 @@ exports.getOctokit = getOctokit;
 /***/ 133:
 /***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
-github = __webpack_require__(127);
-core = __webpack_require__(171);
+const core = __webpack_require__(171)
+const github = __webpack_require__(127)
+const config = __webpack_require__(673);
+const AdmZip = __webpack_require__(672);
+const filesize = __webpack_require__(845);
+const pathname = __webpack_require__(622);
+const fs = __webpack_require__(747);
 
-const test = async () => {
-    const github_token = core.getInput('github-token');
-    const workflow = 'test-on-demand.yml';
-    const artifact_name = 'my-runable';
+const main = async () => {
+    try {
 
-    const client = github.getOctokit(github_token);
+        const client = github.getOctokit(config.inputs.githubToken);
 
-    const params = {
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        //workflow_id: workflow,        
+        console.log("==> Workflow:", workflow);
+
+        console.log("==> Repo:", github.context.repo.repo + "/owner:" + github.context.repo.owner);
+
+        console.log("==> Conclusion:", workflowConclusion);
+
+        if (runNumber) {
+            console.log("==> RunNumber:", runNumber)
+        }
+
+        for await (const runs of client.paginate.iterator(client.actions.listWorkflowRuns,
+            {
+                owner: owner,
+                repo: repo,
+                workflow_id: workflow
+            }
+        )) {
+            for (const run of runs.data) {
+                if (commit && run.head_sha != commit) {
+                    continue;
+                }
+                if (runNumber && run.run_number != runNumber) {
+                    continue;
+                }
+                if (workflowConclusion && (workflowConclusion != run.conclusion && workflowConclusion != run.status)) {
+                    continue;
+                }
+                if (checkArtifacts || searchArtifacts) {
+                    let artifacts = await client.actions.listWorkflowRunArtifacts({
+                        owner: owner,
+                        repo: repo,
+                        run_id: run.id,
+                    })
+                    if (artifacts.data.artifacts.length == 0) {
+                        continue
+                    }
+                    if (searchArtifacts) {
+                        const artifact = artifacts.data.artifacts.find((artifact) => {
+                            return artifact.name == name
+                        })
+                        if (!artifact) {
+                            continue
+                        }
+                    }
+                }
+                runID = run.id;
+                break;
+            }
+            if (runID) {
+                break
+            }
+        }
+
+        if (runID) {
+            console.log("==> RunID:", runID)
+        } else {
+            throw new Error("no matching workflow run found")
+        }
+
+        // let artifacts = await client.paginate(client.actions.listWorkflowRunArtifacts, {
+        //     owner: owner,
+        //     repo: repo,
+        //     run_id: runID,
+        // })
+
+        // // One artifact or all if `name` input is not specified.
+        // if (name) {
+        //     artifacts = artifacts.filter((artifact) => {
+        //         return artifact.name == name
+        //     })
+        // }
+
+        // if (artifacts.length == 0)
+        //     throw new Error("no artifacts found")
+
+        // for (const artifact of artifacts) {
+        //     console.log("==> Artifact:", artifact.id)
+
+        //     const size = filesize(artifact.size_in_bytes, { base: 10 })
+
+        //     console.log(`==> Downloading: ${artifact.name}.zip (${size})`)
+
+        //     const zip = await client.actions.downloadArtifact({
+        //         owner: owner,
+        //         repo: repo,
+        //         artifact_id: artifact.id,
+        //         archive_format: "zip",
+        //     })
+
+        //     const dir = name ? path : pathname.join(path, artifact.name)
+
+        //     fs.mkdirSync(dir, { recursive: true })
+
+        //     const adm = new AdmZip(Buffer.from(zip.data))
+
+        //     adm.getEntries().forEach((entry) => {
+        //         const action = entry.isDirectory ? "creating" : "inflating"
+        //         const filepath = pathname.join(dir, entry.entryName)
+
+        //         console.log(`  ${action}: ${filepath}`)
+        //     })
+
+        //     adm.extractAllTo(dir, true)
+        //}
+    } catch (error) {
+        core.setOutput("error_message", error.message)
+        core.setFailed(error.message)
     }
-    const workflows = await client.paginate('GET /repos/{owner}/{repo}/actions/runs', params);
-
-    core.info(JSON.stringify(workflows))
-    core.info('Done');
-    
 }
 
-test();
+main();
 
 
 /***/ }),
@@ -5167,6 +5268,46 @@ module.exports = require("util");
 
 /***/ }),
 
+/***/ 672:
+/***/ (function(module) {
+
+module.exports = eval("require")("adm-zip");
+
+
+/***/ }),
+
+/***/ 673:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+const core = __webpack_require__(171);
+const github = __webpack_require__(127);
+
+class Config {
+    constructor() {
+        this.input = {
+            githubToken: core.getInput('github-token'),
+            workflow: core.getInput('workflow'),
+            artifactName: core.getInput('artifact-name'),
+
+            path: core.getInput("path", { required: true }),
+            workflowConclusion: "success", //core.getInput("workflow_conclusion"),
+            runNumber: core.getInput("run_number"),
+            checkArtifacts: core.getInput("check_artifacts"),
+            searchArtifacts: core.getInput("search_artifacts"),
+
+        };
+    }
+}
+
+try {
+    module.exports = new Config();
+} catch (error) {
+    core.error(error);
+    core.setFailed(error.message);
+}
+
+/***/ }),
+
 /***/ 712:
 /***/ (function(module) {
 
@@ -6038,6 +6179,14 @@ exports.RequestError = RequestError;
 /***/ (function(module) {
 
 module.exports = require("url");
+
+/***/ }),
+
+/***/ 845:
+/***/ (function(module) {
+
+module.exports = eval("require")("filesize");
+
 
 /***/ }),
 

@@ -9,6 +9,13 @@ inputs:
     description: >-
       GitHub Personal Access Token with the 'repo' scope assigned.
     required: true
+  workflow:
+    description: >-
+      Name of teh workflow (file name withou tth eextension)
+    required: true
+  artifact-name:
+    description: >-
+    required: true
 runs:
   using: node16
   main: ./dist/index.js
