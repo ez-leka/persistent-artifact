@@ -501,14 +501,14 @@ const main = async () => {
 
         const client = github.getOctokit(config.inputs.githubToken);
 
-        console.log("==> Workflow:", workflow);
+        console.log("==> Workflow:", config.inputs.workflow);
 
         console.log("==> Repo:", github.context.repo.repo + "/owner:" + github.context.repo.owner);
 
-        console.log("==> Conclusion:", workflowConclusion);
+        console.log("==> Conclusion:", config.inputs.workflowConclusion);
 
-        if (runNumber) {
-            console.log("==> RunNumber:", runNumber)
+        if (config.inputs.runNumber) {
+            console.log("==> RunNumber:", config.inputs.runNumber)
         }
 
         for await (const runs of client.paginate.iterator(client.actions.listWorkflowRuns,
@@ -519,6 +519,9 @@ const main = async () => {
             }
         )) {
             for (const run of runs.data) {
+
+                core.info(`Run Data: ${JSON.stringify(run)}`);
+                
                 if (commit && run.head_sha != commit) {
                     continue;
                 }
@@ -5273,7 +5276,7 @@ const github = __webpack_require__(127);
 
 class Config {
     constructor() {
-        this.input = {
+        this.inputs = {
             githubToken: core.getInput('github-token'),
             workflow: core.getInput('workflow'),
             artifactName: core.getInput('artifact-name'),
@@ -5285,6 +5288,8 @@ class Config {
             searchArtifacts: core.getInput("search_artifacts"),
 
         };
+
+        core.info('REceived inputs: ' + JSON.stringify(this.inputs));
     }
 }
 

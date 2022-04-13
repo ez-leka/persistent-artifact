@@ -3,7 +3,7 @@ const github = require('@actions/github');
 
 class Config {
     constructor() {
-        this.input = {
+        this.inputs = {
             githubToken: core.getInput('github-token'),
             workflow: core.getInput('workflow'),
             artifactName: core.getInput('artifact-name'),
@@ -15,6 +15,8 @@ class Config {
             searchArtifacts: core.getInput("search_artifacts"),
 
         };
+
+        core.info('REceived inputs: ' + JSON.stringify(this.inputs));
     }
 }
 
