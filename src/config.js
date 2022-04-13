@@ -5,7 +5,7 @@ class Config {
     constructor() {
         this.inputs = {
             githubToken: core.getInput('github-token'),
-            workflow: core.getInput('workflow'),
+            workflow: core.getInput('workflow') + '.yaml',
             artifactName: core.getInput('artifact-name'),
 
             path: core.getInput("path"/*, { required: true }*/),

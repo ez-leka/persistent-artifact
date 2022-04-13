@@ -515,7 +515,7 @@ const main = async () => {
             {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                workflow_id: workflow,
+                workflow_id: config.inputs.workflow,
                 //conclusion: config.inputs.workflowConclusion
             }
         )) {
@@ -5279,7 +5279,7 @@ class Config {
     constructor() {
         this.inputs = {
             githubToken: core.getInput('github-token'),
-            workflow: core.getInput('workflow'),
+            workflow: core.getInput('workflow') + '.yaml',
             artifactName: core.getInput('artifact-name'),
 
             path: core.getInput("path"/*, { required: true }*/),

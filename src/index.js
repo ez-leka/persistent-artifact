@@ -22,7 +22,7 @@ const main = async () => {
             {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                workflow_id: workflow,
+                workflow_id: config.inputs.workflow,
                 //conclusion: config.inputs.workflowConclusion
             }
         )) {
