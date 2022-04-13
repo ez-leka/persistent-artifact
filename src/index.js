@@ -9,8 +9,8 @@ const test = async () => {
     const client = github.getOctokit(github_token);
 
     const params = {
-        owner: 'ez_leka',
-        repo: 'test-on-demand-action-runner',
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         //workflow_id: workflow,        
     }
     const workflows = await client.paginate('GET /repos/{owner}/{repo}/actions/runs', params);
