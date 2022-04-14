@@ -1915,18 +1915,24 @@ const main = async () => {
 
     let found = ArtifactStatus.NotFound;
 
-    for await (const response of client.paginate.iterator(
-        client.rest.actions.listArtifactsForRepo,
-        {
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-        }
-    )) {
-        core.info(`Responce ${JSON.stringify(response)}`);
-        // for (const artifact of response.data) {
-        //     core.info(`Artifact: ${JSON.stringify(artifact)}`);
-        // }
-    }
+    const artifacts = await client.paginate(client.rest.actions.listArtifactsForRepo({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+    }));
+    core.info(`All Artifacts: ${JSON.stringify(artifacts)}`);
+        
+    // for await (const response of client.paginate.iterator(
+    //     client.rest.actions.listArtifactsForRepo,
+    //     {
+    //         owner: github.context.repo.owner,
+    //         repo: github.context.repo.repo,
+    //     }
+    // )) {
+    //     core.info(`Responce ${JSON.stringify(response)}`);
+    //     // for (const artifact of response.data) {
+    //     //     core.info(`Artifact: ${JSON.stringify(artifact)}`);
+    //     // }
+    // }
 
     // const artifacts = client.paginate(client.rest.actions.listArtifactsForRepo({
     //     owner: github.context.repo.owner,
