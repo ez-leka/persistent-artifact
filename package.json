@@ -8,10 +8,13 @@
     "@actions/github": "^4.0.0",
     "lodash": "^4.17.21"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^8.13.0",
+    "eslint-plugin-react": "^7.29.4"
+  },
   "scripts": {
     "index": "node -r dotenv/config ./src/index.js",
-    "lint": "eslint ./src/*.js",      
+    "lint": "eslint ./src/*.js",
     "package": "ncc build ./src/index.js"
   },
   "repository": {

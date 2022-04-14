@@ -1,54 +1,55 @@
-const core = require('@actions/core')
-const github = require('@actions/github')
+const core = require('@actions/core');
+const github = require('@actions/github');
 const artifact = require('@actions/artifact');
 const config = require('./config');
-const fs = require('fs');
-const http = require('http');
+
+const ArtifactStatus = {
+    Available: 'available',
+    Expired: 'expired',
+    NotFound: 'not-found'
+}
+
 
 const main = async () => {
 
-    const artifactClient = artifact.create();
-
     // download a single artifact
-    core.info(`Starting download for ${config.inputs.artifactName}`)
-
+    core.info(`Checking for ${config.inputs.artifactName}`)
 
     const client = github.getOctokit(config.inputs.githubToken);
+    const artifactClient = artifact.create();
 
     const downloadOptions = {
         createArtifactFolder: false
     }
-    
-    const downloadResponse = await artifactClient.downloadArtifact(
-        config.inputs.artifactName,
-        config.resolvedPath,
-        downloadOptions);
 
-    core.info(JSON.stringify(downloadResponse));
+    const artifacts = await client.paginate.iterator(client.rest.actions.listArtifactsForRepo({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+    }));
 
-    // const artifacts = await client.paginate.iterator(octokit.rest.actions.listArtifactsForRepo({
-    //     owner: github.context.repo.owner,
-    //     repo: github.context.repo.repo,
-    // }));
+    let found = ArtifactStatus.NotFound;
 
-    // let found = false;
-    // for (const artifact of artifacts) {
-    //     if (artifact.name === config.inputs.artifactName) {
-    //         found = true;
+    for (const artifact of artifacts) {
+        if (artifact.name === config.inputs.artifactName) {
+            found = ArtifactStatus.Available;
+            if (artifact.expired == true) {
+                found = ArtifactStatus.Expired;
+            }
+            break;
+        }
+    }
+    if (found == ArtifactStatus.Available) {
+        // artifact is available - download it 
+        const downloadResponse = await artifactClient.downloadArtifact(
+            config.inputs.artifactName,
+            config.resolvedPath,
+            downloadOptions);
 
-    //         const file = fs.createWriteStream("");
+        core.info(`Downloaded Response: ${downloadResponse}`);
+    }
 
-    //         const request = http.get("http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg", function (response) {
-    //             response.pipe(file);
+    core.setOutput('artifact-status', found);
 
-    //             // after download completed close filestream
-    //             file.on("finish", () => {
-    //                 file.close();
-    //                 console.log("Download Completed");
-    //             });
-    //         });
-    //     }
-    // }
     // try {
 
     //     const client = github.getOctokit(config.inputs.githubToken);
@@ -71,7 +72,7 @@ const main = async () => {
     //         }
     //     );
 
-        
+
     //     for (const run of runs.data) {
 
     //         core.info(`Run Data: ${JSON.stringify(run)}`);

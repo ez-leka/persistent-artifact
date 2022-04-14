@@ -19,7 +19,7 @@ class Config {
         };
 
         core.info('Received inputs: ' + JSON.stringify(this.inputs));
-
+        
         this.resolvedPath;
         // resolve tilde expansions, path.replace only replaces the first occurrence of a pattern
         if (this.inputs.destinationPath.startsWith(`~`)) {

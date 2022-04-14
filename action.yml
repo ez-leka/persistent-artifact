@@ -15,6 +15,13 @@ inputs:
   path:
     description: >-
     required: true
+outputs:
+  artifact-status:
+    description: >-
+      return status of the artifact-name:
+          available: if artifact is available for download
+          expired: if artifact has expired
+          not-found: if artifact is not found
 runs:
   using: node16
   main: ./dist/index.js
