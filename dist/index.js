@@ -1694,7 +1694,7 @@ exports.getOctokit = getOctokit;
 
 const core = __webpack_require__(171)
 const github = __webpack_require__(127)
-const atrifact = __webpack_require__(141);
+const artifact = __webpack_require__(141);
 const config = __webpack_require__(673);
 const fs = __webpack_require__(747);
 const http = __webpack_require__(605);

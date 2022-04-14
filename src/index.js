@@ -1,6 +1,6 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
-const atrifact = require('@actions/artifact');
+const artifact = require('@actions/artifact');
 const config = require('./config');
 const fs = require('fs');
 const http = require('http');
