@@ -24,11 +24,25 @@ const main = async () => {
 
     let found = ArtifactStatus.NotFound;
 
-    const artifacts = await client.rest.actions.listArtifactsForRepo({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo
-    });
-    core.info(`All Artifacts: ${JSON.stringify(artifacts)}`);
+    const runs = await client.paginate.iterator(client.rest.actions.listWorkflowRuns,
+            {
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                workflow_id: config.inputs.workflow
+            }
+        );
+
+
+    for (const run of runs.data) {
+
+        core.info(`Run Data: ${JSON.stringify(run)}`);
+    }
+
+    // const artifacts = await client.rest.actions.listArtifactsForRepo({
+    //     owner: github.context.repo.owner,
+    //     repo: github.context.repo.repo
+    // });
+    // core.info(`All Artifacts: ${JSON.stringify(artifacts)}`);
         
     // for await (const response of client.paginate.iterator(
     //     client.rest.actions.listArtifactsForRepo,
