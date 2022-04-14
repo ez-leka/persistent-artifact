@@ -28,7 +28,7 @@ const main = async () => {
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
     }))) {
-        core.info(`Artifact: ${artifact}`);
+        core.info(`Artifact: ${JSON.stringify(artifact)}`);
 
         if (artifact.name === config.inputs.artifactName) {
             core.info(`Found`);
