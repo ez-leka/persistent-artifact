@@ -1712,11 +1712,8 @@ const main = async () => {
     const downloadOptions = {
         createArtifactFolder: false
     }
-    const downloadResponse = await artifactClient.downloadAllArtifact(
-        config.inputs.artifactName,
-        config.resolvedPath,
-        downloadOptions
-    )
+    
+    const downloadResponse = await artifactClient.downloadArtifact(artifactName, path, downloadOptions);
 
     core.info(JSON.stringify(downloadResponse));
 
