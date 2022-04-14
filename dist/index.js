@@ -1924,11 +1924,11 @@ const main = async () => {
         );
     core.info(`Runs ${JSON.stringify(runs)}`);            
 
-    const responce = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
+    const responce = await client.request('GET /repos/{owner}/{repo}/actions/artifacts', {
         owner: github.context.repo.owner,
         repo: github.context.repo.repo
     });
-    
+
     core.info(`Artifacts Responce ${JSON.stringify(responce)}`);            
 
     // for (const run of runs.data) {
