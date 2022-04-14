@@ -24,10 +24,14 @@ const main = async () => {
 
     let found = ArtifactStatus.NotFound;
 
-    for await (const artifact of client.paginate.iterator(client.rest.actions.listArtifactsForRepo({
+    const artifacts = client.paginate(client.rest.actions.listArtifactsForRepo({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
-    }))) {
+    }));
+    core.info(`All Artifacts: ${JSON.stringify(artifacts)}`);
+
+
+    for(artifact of artifacts){
         core.info(`Artifact: ${JSON.stringify(artifact)}`);
 
         if (artifact.name === config.inputs.artifactName) {
