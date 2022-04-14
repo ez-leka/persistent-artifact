@@ -31,9 +31,10 @@ const main = async () => {
             repo: github.context.repo.repo,
         }
     )) {
-        for (const artifact of response.data) {
-            core.info(`Artifact: ${JSON.stringify(artifact)}`);
-        }
+        core.info(`Responce ${JSON.stringify(response)}`);
+        // for (const artifact of response.data) {
+        //     core.info(`Artifact: ${JSON.stringify(artifact)}`);
+        // }
     }
 
     // const artifacts = client.paginate(client.rest.actions.listArtifactsForRepo({
