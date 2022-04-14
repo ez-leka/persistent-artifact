@@ -493,122 +493,153 @@ exports.getOctokit = getOctokit;
 
 const core = __webpack_require__(171)
 const github = __webpack_require__(127)
+const atrifact = __webpack_require__(715);
 const config = __webpack_require__(673);
 const fs = __webpack_require__(747);
+const http = __webpack_require__(605);
 
 const main = async () => {
-    try {
 
-        const client = github.getOctokit(config.inputs.githubToken);
+    const artifactClient = artifact.create();
 
-        console.log("==> Workflow:", config.inputs.workflow);
+    // download a single artifact
+    core.info(`Starting download for ${config.inputs.artifactName}`)
 
-        console.log("==> Repo:", github.context.repo.repo + "/owner:" + github.context.repo.owner);
 
-        console.log("==> Conclusion:", config.inputs.workflowConclusion);
+    const client = github.getOctokit(config.inputs.githubToken);
 
-        if (config.inputs.runNumber) {
-            console.log("==> RunNumber:", config.inputs.runNumber)
-        }
-
-        for await (const runs of client.paginate.iterator(client.rest.actions.listWorkflowRuns,
-            {
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                workflow_id: config.inputs.workflow
-            }
-        )) {
-            for (const run of runs.data) {
-
-                core.info(`Run Data: ${JSON.stringify(run)}`);
-
-                if (config.inputs.runNumber && run.run_number != runNumber) {
-                    continue;
-                }
-                if (config.inputs.workflowConclusion && config.inputs.workflowConclusion != run.conclusion)
-                    continue;
-                // }
-                // if (checkArtifacts || searchArtifacts) {
-                //     let artifacts = await client.actions.listWorkflowRunArtifacts({
-                //         owner: owner,
-                //         repo: repo,
-                //         run_id: run.id,
-                //     })
-                //     if (artifacts.data.artifacts.length == 0) {
-                //         continue
-                //     }
-                //     if (searchArtifacts) {
-                //         const artifact = artifacts.data.artifacts.find((artifact) => {
-                //             return artifact.name == name
-                //         })
-                //         if (!artifact) {
-                //             continue
-                //         }
-                //     }
-                // }
-                runID = run.id;
-                break;
-            }
-            if (runID) {
-                break
-            }
-        }
-
-        if (runID) {
-            console.log("==> RunID:", runID)
-        } else {
-            throw new Error("no matching workflow run found")
-        }
-
-        // let artifacts = await client.paginate(client.actions.listWorkflowRunArtifacts, {
-        //     owner: owner,
-        //     repo: repo,
-        //     run_id: runID,
-        // })
-
-        // // One artifact or all if `name` input is not specified.
-        // if (name) {
-        //     artifacts = artifacts.filter((artifact) => {
-        //         return artifact.name == name
-        //     })
-        // }
-
-        // if (artifacts.length == 0)
-        //     throw new Error("no artifacts found")
-
-        // for (const artifact of artifacts) {
-        //     console.log("==> Artifact:", artifact.id)
-
-        //     const size = filesize(artifact.size_in_bytes, { base: 10 })
-
-        //     console.log(`==> Downloading: ${artifact.name}.zip (${size})`)
-
-        //     const zip = await client.actions.downloadArtifact({
-        //         owner: owner,
-        //         repo: repo,
-        //         artifact_id: artifact.id,
-        //         archive_format: "zip",
-        //     })
-
-        //     const dir = name ? path : pathname.join(path, artifact.name)
-
-        //     fs.mkdirSync(dir, { recursive: true })
-
-        //     const adm = new AdmZip(Buffer.from(zip.data))
-
-        //     adm.getEntries().forEach((entry) => {
-        //         const action = entry.isDirectory ? "creating" : "inflating"
-        //         const filepath = pathname.join(dir, entry.entryName)
-
-        //         console.log(`  ${action}: ${filepath}`)
-        //     })
-
-        //     adm.extractAllTo(dir, true)
-        //}
-    } catch (error) {
-        core.setOutput("error_message", error.message)
-        core.setFailed(error.message)
+    const downloadOptions = {
+        createArtifactFolder: false
     }
+    const downloadResponse = await artifactClient.downloadAllArtifact(
+        config.artifactName,
+        config.resolvedPath,
+        downloadOptions
+    )
+
+    core.info(JSON.stringify(downloadResponse));
+    
+    // const artifacts = await client.paginate.iterator(octokit.rest.actions.listArtifactsForRepo({
+    //     owner: github.context.repo.owner,
+    //     repo: github.context.repo.repo,
+    // }));
+
+    // let found = false;
+    // for (const artifact of artifacts) {
+    //     if (artifact.name === config.inputs.artifactName) {
+    //         found = true;
+
+    //         const file = fs.createWriteStream("");
+
+    //         const request = http.get("http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg", function (response) {
+    //             response.pipe(file);
+
+    //             // after download completed close filestream
+    //             file.on("finish", () => {
+    //                 file.close();
+    //                 console.log("Download Completed");
+    //             });
+    //         });
+    //     }
+    // }
+    // try {
+
+    //     const client = github.getOctokit(config.inputs.githubToken);
+
+    //     console.log("==> Workflow:", config.inputs.workflow);
+
+    //     console.log("==> Repo:", github.context.repo.repo + "/owner:" + github.context.repo.owner);
+
+    //     console.log("==> Conclusion:", config.inputs.workflowConclusion);
+
+    //     if (config.inputs.runNumber) {
+    //         console.log("==> RunNumber:", config.inputs.runNumber)
+    //     }
+
+    //     const runs = await client.paginate.iterator(client.rest.actions.listWorkflowRuns,
+    //         {
+    //             owner: github.context.repo.owner,
+    //             repo: github.context.repo.repo,
+    //             workflow_id: config.inputs.workflow
+    //         }
+    //     );
+
+        
+    //     for (const run of runs.data) {
+
+    //         core.info(`Run Data: ${JSON.stringify(run)}`);
+
+    //         if (config.inputs.runNumber && run.run_number != runNumber) {
+    //             continue;
+    //         }
+    //         if (config.inputs.workflowConclusion && config.inputs.workflowConclusion != run.conclusion) {
+    //             continue;
+    //         }
+    //         // found successfull run with artifact
+
+    //         // found successfull run with artifact
+    //         const runTimestamp = Date.parse(run.run_started_at);
+    //         if (dateOfRun == null || (dateOfRun < runTimestamp)) {
+    //             foundRunId = run.id;
+    //             dateOfRun = runTimestamp;
+    //         }
+    //     }
+
+    //     if (runID) {
+    //         core.info(`RunID: ${runID}`);
+    //     } else {
+    //         throw new Error("no matching workflow run found");
+    //     }
+
+    //     // let artifacts = await client.paginate(client.actions.listWorkflowRunArtifacts, {
+    //     //     owner: owner,
+    //     //     repo: repo,
+    //     //     run_id: runID,
+    //     // })
+
+    //     // // One artifact or all if `name` input is not specified.
+    //     // if (name) {
+    //     //     artifacts = artifacts.filter((artifact) => {
+    //     //         return artifact.name == name
+    //     //     })
+    //     // }
+
+    //     // if (artifacts.length == 0)
+    //     //     throw new Error("no artifacts found")
+
+    //     // for (const artifact of artifacts) {
+    //     //     console.log("==> Artifact:", artifact.id)
+
+    //     //     const size = filesize(artifact.size_in_bytes, { base: 10 })
+
+    //     //     console.log(`==> Downloading: ${artifact.name}.zip (${size})`)
+
+    //     //     const zip = await client.actions.downloadArtifact({
+    //     //         owner: owner,
+    //     //         repo: repo,
+    //     //         artifact_id: artifact.id,
+    //     //         archive_format: "zip",
+    //     //     })
+
+    //     //     const dir = name ? path : pathname.join(path, artifact.name)
+
+    //     //     fs.mkdirSync(dir, { recursive: true })
+
+    //     //     const adm = new AdmZip(Buffer.from(zip.data))
+
+    //     //     adm.getEntries().forEach((entry) => {
+    //     //         const action = entry.isDirectory ? "creating" : "inflating"
+    //     //         const filepath = pathname.join(dir, entry.entryName)
+
+    //     //         console.log(`  ${action}: ${filepath}`)
+    //     //     })
+
+    //     //     adm.extractAllTo(dir, true)
+    //     //}
+    // } catch (error) {
+    //     core.setOutput("error_message", error.message)
+    //     core.setFailed(error.message)
+    // }
 }
 
 main();
@@ -5270,23 +5301,34 @@ module.exports = require("util");
 
 const core = __webpack_require__(171);
 const github = __webpack_require__(127);
+const os = __webpack_require__(87);
+const path = __webpack_require__(622);
 
 class Config {
     constructor() {
         this.inputs = {
-            githubToken: core.getInput('github-token'),
-            workflow: core.getInput('workflow') + '.yaml',
-            artifactName: core.getInput('artifact-name'),
+            githubToken: core.getInput('github-token',{ required: true }),
+            // workflow: core.getInput('workflow') + '.yaml',
+            artifactName: core.getInput('artifact-name', { required: true }),
+            destinationPath: core.getInput("path", { required: true }),
 
-            path: core.getInput("path"/*, { required: true }*/),
-            workflowConclusion: "success", //core.getInput("workflow_conclusion"),
-            runNumber: core.getInput("run_number"),
-            checkArtifacts: core.getInput("check_artifacts"),
-            searchArtifacts: core.getInput("search_artifacts"),
+            // workflowConclusion: "success", //core.getInput("workflow_conclusion"),
+            // runNumber: core.getInput("run_number"),
+            // checkArtifacts: core.getInput("check_artifacts"),
+            // searchArtifacts: core.getInput("search_artifacts"),
 
         };
 
-        core.info('REceived inputs: ' + JSON.stringify(this.inputs));
+        core.info('Received inputs: ' + JSON.stringify(this.inputs));
+
+        this.resolvedPath;
+        // resolve tilde expansions, path.replace only replaces the first occurrence of a pattern
+        if (this.inputs.destinationPath.startsWith(`~`)) {
+            this.resolvedPath = resolve(this.inputs.destinationPath.replace('~', os.homedir()));
+        } else {
+            this.resolvedPath = resolve(this.inputs.destinationPath);
+        }
+        core.info(`Resolved path is ${resolvedPath}`);
     }
 }
 
@@ -5323,6 +5365,14 @@ module.exports.implForWrapper = function (wrapper) {
   return wrapper[module.exports.implSymbol];
 };
 
+
+
+/***/ }),
+
+/***/ 715:
+/***/ (function(module) {
+
+module.exports = eval("require")("@actions/atrifact");
 
 
 /***/ }),
