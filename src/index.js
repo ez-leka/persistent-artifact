@@ -19,7 +19,7 @@ const main = async () => {
         createArtifactFolder: false
     }
     const downloadResponse = await artifactClient.downloadAllArtifact(
-        config.artifactName,
+        config.inputs.artifactName,
         config.resolvedPath,
         downloadOptions
     )

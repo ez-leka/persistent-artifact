@@ -23,11 +23,11 @@ class Config {
         this.resolvedPath;
         // resolve tilde expansions, path.replace only replaces the first occurrence of a pattern
         if (this.inputs.destinationPath.startsWith(`~`)) {
-            this.resolvedPath = resolve(this.inputs.destinationPath.replace('~', os.homedir()));
+            this.resolvedPath = path.resolve(this.inputs.destinationPath.replace('~', os.homedir()));
         } else {
-            this.resolvedPath = resolve(this.inputs.destinationPath);
+            this.resolvedPath = path.resolve(this.inputs.destinationPath);
         }
-        core.info(`Resolved path is ${resolvedPath}`);
+        core.info(`Resolved path is ${this.resolvedPath}`);
     }
 }
 
