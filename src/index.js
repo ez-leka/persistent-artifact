@@ -24,7 +24,7 @@ const main = async () => {
 
     let found = ArtifactStatus.NotFound;
 
-    const runs = await client.paginate.(client.rest.actions.listWorkflowRuns,
+    const runs = await client.paginate(client.rest.actions.listWorkflowRuns,
             {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,

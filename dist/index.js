@@ -1915,19 +1915,19 @@ const main = async () => {
 
     let found = ArtifactStatus.NotFound;
 
-    const runs = await client.paginate.iterator(client.rest.actions.listWorkflowRuns,
+    const runs = await client.paginate(client.rest.actions.listWorkflowRuns,
             {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 workflow_id: 'make-artifact.yaml'
             }
         );
+    core.info(`Runs ${JSON.stringify(runs)}`);            
 
+    // for (const run of runs.data) {
 
-    for (const run of runs.data) {
-
-        core.info(`Run Data: ${JSON.stringify(run)}`);
-    }
+    //     core.info(`Run Data: ${JSON.stringify(run)}`);
+    // }
 
     // const artifacts = await client.rest.actions.listArtifactsForRepo({
     //     owner: github.context.repo.owner,
