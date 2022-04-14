@@ -40,8 +40,8 @@ const main = async () => {
     //     }
     // );
     let responce = await client.paginate(client.actions.listWorkflowRunArtifacts, {
-        owner: owner,
-        repo: repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         run_id: github.context.runId,
     })
 
