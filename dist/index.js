@@ -1906,7 +1906,7 @@ const main = async () => {
     // download a single artifact
     core.info(`Checking for ${config.inputs.artifactName}`)
 
-    const client = github.getOctokit('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');
+    const client = github.getOctokit(config.inputs.githubToken);
     const artifactClient = artifact.create();
 
     const downloadOptions = {
@@ -1916,21 +1916,27 @@ const main = async () => {
     let found = ArtifactStatus.NotFound;
 
     const runs = await client.paginate(client.rest.actions.listWorkflowRuns,
-            {
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                workflow_id: 'make-artifact.yaml'
-            }
-        );
-    core.info(`Runs ${JSON.stringify(runs)}`);            
-
-    const responce = await client.paginate(client.rest.actions.listArtifactsForRepo,
         {
             owner: github.context.repo.owner,
-            repo: github.context.repo.repo
+            repo: github.context.repo.repo,
+            workflow_id: 'make-artifact.yaml'
         }
     );
-    core.info(`Artifacts Responce ${JSON.stringify(responce)}`);            
+    core.info(`Runs ${JSON.stringify(runs)}`);
+
+    // const responce = await client.paginate(client.rest.actions.listArtifactsForRepo,
+    //     {
+    //         owner: github.context.repo.owner,
+    //         repo: github.context.repo.repo
+    //     }
+    // );
+    let responce = await client.paginate(client.actions.listWorkflowRunArtifacts, {
+        owner: owner,
+        repo: repo,
+        run_id: github.context.runId,
+    })
+
+    core.info(`Artifacts Responce ${JSON.stringify(responce)}`);
 
     // for (const run of runs.data) {
 
@@ -1942,7 +1948,7 @@ const main = async () => {
     //     repo: github.context.repo.repo
     // });
     // core.info(`All Artifacts: ${JSON.stringify(artifacts)}`);
-        
+
     // for await (const response of client.paginate.iterator(
     //     client.rest.actions.listArtifactsForRepo,
     //     {
