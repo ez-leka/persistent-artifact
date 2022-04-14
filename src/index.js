@@ -1,6 +1,6 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
-const atrifact = require('@actions/atrifact');
+const atrifact = require('@actions/artifact');
 const config = require('./config');
 const fs = require('fs');
 const http = require('http');
@@ -25,7 +25,7 @@ const main = async () => {
     )
 
     core.info(JSON.stringify(downloadResponse));
-    
+
     // const artifacts = await client.paginate.iterator(octokit.rest.actions.listArtifactsForRepo({
     //     owner: github.context.repo.owner,
     //     repo: github.context.repo.repo,
