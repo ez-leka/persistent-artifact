@@ -1924,6 +1924,14 @@ const main = async () => {
         );
     core.info(`Runs ${JSON.stringify(runs)}`);            
 
+    const responce = await client.paginate(client.rest.actions.listArtifactsForRepo,
+        {
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+        }
+    );
+    core.info(`Artifacts Responce ${JSON.stringify(responce)}`);            
+
     // for (const run of runs.data) {
 
     //     core.info(`Run Data: ${JSON.stringify(run)}`);
