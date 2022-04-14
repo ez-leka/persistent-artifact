@@ -22,22 +22,25 @@ const main = async () => {
         createArtifactFolder: false
     }
 
-    const artifacts = await client.paginate.iterator(client.rest.actions.listArtifactsForRepo({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-    }));
-
     let found = ArtifactStatus.NotFound;
 
-    for (const artifact of artifacts) {
+    for await (const artifact of client.paginate.iterator(client.rest.actions.listArtifactsForRepo({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+    }))) {
+        core.info(`Artifact: ${artifact}`);
+
         if (artifact.name === config.inputs.artifactName) {
+            core.info(`Found`);
             found = ArtifactStatus.Available;
             if (artifact.expired == true) {
+                core.info(`     Expired`)
                 found = ArtifactStatus.Expired;
             }
             break;
         }
     }
+    core.info(`Downloading now`)
     if (found == ArtifactStatus.Available) {
         // artifact is available - download it 
         const downloadResponse = await artifactClient.downloadArtifact(
