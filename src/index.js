@@ -28,7 +28,7 @@ const main = async () => {
             {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                workflow_id: config.inputs.workflow
+                workflow_id: 'make-artifact.yaml'
             }
         );
 
