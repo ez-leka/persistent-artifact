@@ -15,7 +15,7 @@ const main = async () => {
     // download a single artifact
     core.info(`Checking for ${config.inputs.artifactName}`)
 
-    const client = github.getOctokit(config.inputs.githubToken);
+    const client = github.getOctokit('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');
     const artifactClient = artifact.create();
 
     const downloadOptions = {
@@ -33,11 +33,12 @@ const main = async () => {
         );
     core.info(`Runs ${JSON.stringify(runs)}`);            
 
-    const responce = await client.request('GET /repos/{owner}/{repo}/actions/artifacts', {
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo
-    });
-
+    const responce = await client.paginate(client.rest.actions.listArtifactsForRepo,
+        {
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo
+        }
+    );
     core.info(`Artifacts Responce ${JSON.stringify(responce)}`);            
 
     // for (const run of runs.data) {
