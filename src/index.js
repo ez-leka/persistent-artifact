@@ -1,7 +1,9 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const artifact_tk = require('@actions/artifact');
 const config = require('./config');
+const fs = require('fs');
+const http = require('http');
+const ungzip = require('unzip');
 
 const ArtifactStatus = {
     Available: 'available',
@@ -43,6 +45,25 @@ const checkArtifactStatus = async (client) => {
     return artifact;
 }
 
+const downloadArtifact = async (artifact) => {
+    // const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
+    // http.get(artifact.archive_download_url, function (response) {
+    //     response.on('data', function (data) {
+    //         fs.appendFileSync(tmpFilePath, data)
+    //     });
+    //     response.on('end', function () {
+    //         var zip = new AdmZip(tmpFilePath)
+    //         zip.extractAllTo("assets/extracted/" + filename)
+    //         fs.unlink(tmpFilePath)
+    //     })
+    // });    
+    const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
+    http.get(artifact.archive_download_url, function (response) {
+        response.on('data', function (data) {
+            fs.appendFileSync(tmpFilePath, data)
+        });
+    });
+}
 
 const main = async () => {
 
@@ -65,7 +86,6 @@ const main = async () => {
         found = ArtifactStatus.Available;
 
         // download artifact
-        await artifactClient.downloadArtifact(config.inputs.artifactName, config.inputs.destinationPath, downloadOptions);
     }
 
     core.debug(`Setting output to ${found}`);
