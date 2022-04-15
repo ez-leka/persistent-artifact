@@ -9,7 +9,7 @@ const ArtifactStatus = {
     NotFound: 'not-found'
 }
 
-const checkArtifactStatus = async () => {
+const checkArtifactStatus = async (client) => {
 
     let found = ArtifactStatus.NotFound;
     try {
