@@ -24,11 +24,10 @@ const checkArtifactStatus = async (client) => {
         )) {
             core.info(`Responce data ${JSON.stringify(response.data)}`);
             // do whatever you want with each response, break out of the loop, etc.
-            const arts = response.data;
-            core.info("%d artifacts  found", arts.length);
+            core.info("%d artifacts  found", response.data.length);
 
             // filter array of artifacts by name
-            const named_artifacts = arts.filter(function (el) {
+            const named_artifacts = response.data.filter(function (el) {
                 return el.name == config.inputs.artifactName &&
                     el.expired !== true
             });
