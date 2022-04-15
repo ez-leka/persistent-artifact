@@ -7,15 +7,8 @@ class Config {
     constructor() {
         this.inputs = {
             githubToken: core.getInput('github-token',{ required: true }),
-            // workflow: core.getInput('workflow') + '.yaml',
             artifactName: core.getInput('artifact-name', { required: true }),
             destinationPath: core.getInput("path", { required: true }),
-
-            // workflowConclusion: "success", //core.getInput("workflow_conclusion"),
-            // runNumber: core.getInput("run_number"),
-            // checkArtifacts: core.getInput("check_artifacts"),
-            // searchArtifacts: core.getInput("search_artifacts"),
-
         };
         process.env['RUNNER_DEBUG'] = 1;
 
