@@ -606,26 +606,26 @@ const downloadArtifact = async (client, artifact) => {
         artifact_id: artifact.id,
         archive_format: 'zip'
     });
-    core.debug(`Received dowload URL = ${url}`);
+    core.debug(`Received dowload URL = ${url.toString()}`);
 
-    http.get(url, function (res) {
-        var data = [], dataLen = 0;
+    // http.get(url, function (res) {
+    //     var data = [], dataLen = 0;
 
-        res.on('data', function (chunk) {
-            data.push(chunk);
-            dataLen += chunk.length;
+    //     res.on('data', function (chunk) {
+    //         data.push(chunk);
+    //         dataLen += chunk.length;
 
-        }).on('end', function () {
-            var buf = Buffer.alloc(dataLen);
+    //     }).on('end', function () {
+    //         var buf = Buffer.alloc(dataLen);
 
-            for (var i = 0, len = data.length, pos = 0; i < len; i++) {
-                data[i].copy(buf, pos);
-                pos += data[i].length;
-            }
+    //         for (var i = 0, len = data.length, pos = 0; i < len; i++) {
+    //             data[i].copy(buf, pos);
+    //             pos += data[i].length;
+    //         }
 
-            core.debug(`data from url: ${buf.toString()}`);
-        });
-    });
+    //         core.debug(`data from url: ${buf.toString()}`);
+    //     });
+    // });
 
     // const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
     // http.get(artifact.archive_download_url, function (response) {
