@@ -882,7 +882,6 @@ const checkArtifactStatus = async (client) => {
 }
 
 const downloadArtifact = async (client, artifact) => {
-    //const size = filesize(artifact.size_in_bytes, { base: 10 });
 
     const zip = await client.actions.downloadArtifact({
         owner: github.context.repo.owner,
@@ -891,10 +890,11 @@ const downloadArtifact = async (client, artifact) => {
         archive_format: "zip",
     });
   
+    const dir = config.resolvedPath;
     // make all directories
-    core.debug(`Destination directory = ${config.resolvedPath}`);
+    core.debug(`Destination directory = ${dir}`);
 
-    fs.mkdirSync(config.resolvedPath, { recursive: true });    
+    fs.mkdirSync(dir, { recursive: true });    
 
     const adm = new AdmZip(Buffer.from(zip.data));
     adm.getEntries().forEach((entry) => {

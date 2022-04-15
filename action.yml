@@ -14,7 +14,8 @@ inputs:
     required: true
   path:
     description: >-
-    required: true
+    required: false
+    default: "./"
 outputs:
   artifact-status:
     description: >-
