@@ -1900,6 +1900,27 @@ const ArtifactStatus = {
     NotFound: 'not-found'
 }
 
+const checkArtifactStatus = async () => {
+
+    let found = ArtifactStatus.NotFound;
+    try {
+        const responce = client.paginate(
+            client.rest.actions.listArtifactsForRepo,
+            {
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+            }
+        );
+
+        core.info(`Responce ${JSON.stringify(responce)}`);
+        for (const artifact of response.data) {
+            core.info(`Artifact: ${JSON.stringify(artifact)}`);
+        }
+    } catch (error) {
+        core.error(error);
+    }
+    return found;
+}
 
 const main = async () => {
 
@@ -1913,35 +1934,17 @@ const main = async () => {
         createArtifactFolder: false
     }
 
-    let found = ArtifactStatus.NotFound;
+    let found = checkArtifactStatus(client);
 
-    const runs = await client.paginate(client.rest.actions.listWorkflowRuns,
-        {
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            workflow_id: 'make-artifact.yaml'
-        }
-    );
-    core.info(`Runs ${JSON.stringify(runs)}`);
 
-    // const responce = await client.paginate(client.rest.actions.listArtifactsForRepo,
+    // const runs = await client.paginate(client.rest.actions.listWorkflowRuns,
     //     {
     //         owner: github.context.repo.owner,
-    //         repo: github.context.repo.repo
+    //         repo: github.context.repo.repo,
+    //         workflow_id: github.context.sha,
     //     }
     // );
-    let responce = await client.paginate(client.actions.listWorkflowRunArtifacts, {
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        run_id: github.context.runId,
-    })
-
-    core.info(`Artifacts Responce ${JSON.stringify(responce)}`);
-
-    // for (const run of runs.data) {
-
-    //     core.info(`Run Data: ${JSON.stringify(run)}`);
-    // }
+    // core.info(`Runs ${JSON.stringify(runs)}`);
 
     // const artifacts = await client.rest.actions.listArtifactsForRepo({
     //     owner: github.context.repo.owner,
