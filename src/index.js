@@ -56,7 +56,25 @@ const downloadArtifact = async (artifact) => {
     //         zip.extractAllTo("assets/extracted/" + filename)
     //         fs.unlink(tmpFilePath)
     //     })
-    // });    
+    // });
+    http.get(file_url, function (res) {
+        var data = [], dataLen = 0;
+
+        res.on('data', function (chunk) {
+            data.push(chunk);
+            dataLen += chunk.length;
+
+        }).on('end', function () {
+            var buf = Buffer.alloc(dataLen);
+
+            for (var i = 0, len = data.length, pos = 0; i < len; i++) {
+                data[i].copy(buf, pos);
+                pos += data[i].length;
+            }
+
+            core.debug(`data from url: ${buf.toString()}`);
+        });
+    
     const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
     http.get(artifact.archive_download_url, function (response) {
         response.on('data', function (data) {
