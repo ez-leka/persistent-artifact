@@ -3,7 +3,7 @@ const github = require('@actions/github');
 const config = require('./config');
 const fs = require('fs');
 const http = require('http');
-const ungzip = require('unzip');
+//const ungzip = require('unzip');
 
 const ArtifactStatus = {
     Available: 'available',

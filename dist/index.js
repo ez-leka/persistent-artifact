@@ -545,7 +545,7 @@ const github = __webpack_require__(462);
 const config = __webpack_require__(673);
 const fs = __webpack_require__(747);
 const http = __webpack_require__(605);
-const ungzip = __webpack_require__(354);
+//const ungzip = require('unzip');
 
 const ArtifactStatus = {
     Available: 'available',
@@ -2873,14 +2873,6 @@ function getApiBaseUrl() {
 }
 exports.getApiBaseUrl = getApiBaseUrl;
 //# sourceMappingURL=utils.js.map
-
-/***/ }),
-
-/***/ 354:
-/***/ (function(module) {
-
-module.exports = eval("require")("unzip");
-
 
 /***/ }),
 
