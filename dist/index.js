@@ -543,9 +543,10 @@ exports.toCommandProperties = toCommandProperties;
 const core = __webpack_require__(310);
 const github = __webpack_require__(462);
 const config = __webpack_require__(673);
+const AdmZip = __webpack_require__(672);
+const filesize = __webpack_require__(845);
+const pathname = __webpack_require__(622);
 const fs = __webpack_require__(747);
-const http = __webpack_require__(211);
-//const ungzip = require('unzip');
 
 const ArtifactStatus = {
     Available: 'available',
@@ -588,52 +589,32 @@ const checkArtifactStatus = async (client) => {
 }
 
 const downloadArtifact = async (client, artifact) => {
-    // const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
-    // http.get(artifact.archive_download_url, function (response) {
-    //     response.on('data', function (data) {
-    //         fs.appendFileSync(tmpFilePath, data)
-    //     });
-    //     response.on('end', function () {
-    //         var zip = new AdmZip(tmpFilePath)
-    //         zip.extractAllTo("assets/extracted/" + filename)
-    //         fs.unlink(tmpFilePath)
-    //     })
-    // });
+    const size = filesize(artifact.size_in_bytes, { base: 10 });
 
-    const url = await client.paginate(client.rest.actions.downloadArtifact, {
+    const zip = await client.actions.downloadArtifact({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         artifact_id: artifact.id,
-        archive_format: 'zip'
+        archive_format: "zip",
     });
-    core.debug(`Received dowload URL = ${String.fromCharCode.apply(null, new Uint8Array(url))}`);
+  
+    // make all directories
+    const dir = config.inputs.artifactName ? config.resolvedPath : pathname.join(config.resolvedPath, config.inputs.artifact.name);
+    core.debug(`Destination directory = ${dir}`);
 
-    // http.get(url, function (res) {
-    //     var data = [], dataLen = 0;
+    fs.mkdirSync(dir, { recursive: true });    
 
-    //     res.on('data', function (chunk) {
-    //         data.push(chunk);
-    //         dataLen += chunk.length;
+    const adm = new AdmZip(Buffer.from(zip.data));
+    adm.getEntries().forEach((entry) => {
+        const action = entry.isDirectory ? "creating" : "inflating"
+        const filepath = pathname.join(dir, entry.entryName)
 
-    //     }).on('end', function () {
-    //         var buf = Buffer.alloc(dataLen);
+        core.debug(`       ${action}: ${filepath}`);
+    })
 
-    //         for (var i = 0, len = data.length, pos = 0; i < len; i++) {
-    //             data[i].copy(buf, pos);
-    //             pos += data[i].length;
-    //         }
+    adm.extractAllTo(dir, true);
 
-    //         core.debug(`data from url: ${buf.toString()}`);
-    //     });
-    // });
-
-    // const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
-    // http.get(artifact.archive_download_url, function (response) {
-    //     response.on('data', function (data) {
-    //         fs.appendFileSync(tmpFilePath, data)
-    //     });
-    // });
-}
+};
 
 const main = async () => {
 
@@ -4483,6 +4464,14 @@ module.exports = require("util");
 
 /***/ }),
 
+/***/ 672:
+/***/ (function(module) {
+
+module.exports = eval("require")("adm-zip");
+
+
+/***/ }),
+
 /***/ 673:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -8171,6 +8160,14 @@ exports.Context = Context;
 /***/ (function(module) {
 
 module.exports = require("url");
+
+/***/ }),
+
+/***/ 845:
+/***/ (function(module) {
+
+module.exports = eval("require")("filesize");
+
 
 /***/ }),
 

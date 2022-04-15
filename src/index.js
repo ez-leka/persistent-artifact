@@ -1,9 +1,10 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const config = require('./config');
+const AdmZip = require('adm-zip');
+const filesize = require('filesize');
+const pathname = require('path');
 const fs = require('fs');
-const http = require('https');
-//const ungzip = require('unzip');
 
 const ArtifactStatus = {
     Available: 'available',
@@ -46,52 +47,32 @@ const checkArtifactStatus = async (client) => {
 }
 
 const downloadArtifact = async (client, artifact) => {
-    // const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
-    // http.get(artifact.archive_download_url, function (response) {
-    //     response.on('data', function (data) {
-    //         fs.appendFileSync(tmpFilePath, data)
-    //     });
-    //     response.on('end', function () {
-    //         var zip = new AdmZip(tmpFilePath)
-    //         zip.extractAllTo("assets/extracted/" + filename)
-    //         fs.unlink(tmpFilePath)
-    //     })
-    // });
+    const size = filesize(artifact.size_in_bytes, { base: 10 });
 
-    const url = await client.paginate(client.rest.actions.downloadArtifact, {
+    const zip = await client.actions.downloadArtifact({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         artifact_id: artifact.id,
-        archive_format: 'zip'
+        archive_format: "zip",
     });
-    core.debug(`Received dowload URL = ${String.fromCharCode.apply(null, new Uint8Array(url))}`);
+  
+    // make all directories
+    const dir = config.inputs.artifactName ? config.resolvedPath : pathname.join(config.resolvedPath, config.inputs.artifact.name);
+    core.debug(`Destination directory = ${dir}`);
 
-    // http.get(url, function (res) {
-    //     var data = [], dataLen = 0;
+    fs.mkdirSync(dir, { recursive: true });    
 
-    //     res.on('data', function (chunk) {
-    //         data.push(chunk);
-    //         dataLen += chunk.length;
+    const adm = new AdmZip(Buffer.from(zip.data));
+    adm.getEntries().forEach((entry) => {
+        const action = entry.isDirectory ? "creating" : "inflating"
+        const filepath = pathname.join(dir, entry.entryName)
 
-    //     }).on('end', function () {
-    //         var buf = Buffer.alloc(dataLen);
+        core.debug(`       ${action}: ${filepath}`);
+    })
 
-    //         for (var i = 0, len = data.length, pos = 0; i < len; i++) {
-    //             data[i].copy(buf, pos);
-    //             pos += data[i].length;
-    //         }
+    adm.extractAllTo(dir, true);
 
-    //         core.debug(`data from url: ${buf.toString()}`);
-    //     });
-    // });
-
-    // const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
-    // http.get(artifact.archive_download_url, function (response) {
-    //     response.on('data', function (data) {
-    //         fs.appendFileSync(tmpFilePath, data)
-    //     });
-    // });
-}
+};
 
 const main = async () => {
 
