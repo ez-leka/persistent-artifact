@@ -13,14 +13,13 @@ const checkArtifactStatus = async (client) => {
 
     let found = ArtifactStatus.NotFound;
     try {
-        const responce = client.paginate(
+        const responce = client.paginate.iterator(
             client.rest.actions.listArtifactsForRepo,
             {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
             }
         );
-
         core.info(`Responce ${JSON.stringify(responce)}`);
         for (const artifact of responce.data) {
             core.info(`Artifact: ${JSON.stringify(artifact)}`);
