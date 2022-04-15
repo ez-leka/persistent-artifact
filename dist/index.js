@@ -542,7 +542,7 @@ exports.toCommandProperties = toCommandProperties;
 
 const core = __webpack_require__(310);
 const github = __webpack_require__(462);
-//const artifact = require('@actions/artifact');
+//const artifact_tk = require('@actions/artifact');
 const config = __webpack_require__(673);
 const http = __webpack_require__(605);
 const fs = __webpack_require__(747);
@@ -594,7 +594,7 @@ const main = async () => {
     core.info(`Checking for ${config.inputs.artifactName}`)
 
     const client = github.getOctokit(config.inputs.githubToken);
-    //const artifactClient = artifact.create();
+    //const artifactClient = artifact_tk.create();
 
     const downloadOptions = {
         createArtifactFolder: false
@@ -610,7 +610,7 @@ const main = async () => {
 
     }
 
-
+    core.info(`Setting output to ${found}`);
     core.setOutput('artifact-status', found);
 
     // try {
