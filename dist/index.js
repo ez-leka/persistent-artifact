@@ -1913,7 +1913,7 @@ const checkArtifactStatus = async (client) => {
         );
 
         core.info(`Responce ${JSON.stringify(responce)}`);
-        for (const artifact of response.data) {
+        for (const artifact of responce.data) {
             core.info(`Artifact: ${JSON.stringify(artifact)}`);
         }
     } catch (error) {
