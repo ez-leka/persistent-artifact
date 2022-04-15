@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const config = require('./config');
 const AdmZip = require('adm-zip');
-const filesize = require('filesize');
+//const filesize = require('filesize');
 const pathname = require('path');
 const fs = require('fs');
 
@@ -47,7 +47,7 @@ const checkArtifactStatus = async (client) => {
 }
 
 const downloadArtifact = async (client, artifact) => {
-    const size = filesize(artifact.size_in_bytes, { base: 10 });
+    //const size = filesize(artifact.size_in_bytes, { base: 10 });
 
     const zip = await client.actions.downloadArtifact({
         owner: github.context.repo.owner,

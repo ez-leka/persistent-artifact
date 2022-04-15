@@ -837,7 +837,7 @@ const core = __webpack_require__(310);
 const github = __webpack_require__(462);
 const config = __webpack_require__(673);
 const AdmZip = __webpack_require__(208);
-const filesize = __webpack_require__(845);
+//const filesize = require('filesize');
 const pathname = __webpack_require__(622);
 const fs = __webpack_require__(747);
 
@@ -882,7 +882,7 @@ const checkArtifactStatus = async (client) => {
 }
 
 const downloadArtifact = async (client, artifact) => {
-    const size = filesize(artifact.size_in_bytes, { base: 10 });
+    //const size = filesize(artifact.size_in_bytes, { base: 10 });
 
     const zip = await client.actions.downloadArtifact({
         owner: github.context.repo.owner,
@@ -10309,14 +10309,6 @@ exports.Context = Context;
 /***/ (function(module) {
 
 module.exports = require("url");
-
-/***/ }),
-
-/***/ 845:
-/***/ (function(module) {
-
-module.exports = eval("require")("filesize");
-
 
 /***/ }),
 
