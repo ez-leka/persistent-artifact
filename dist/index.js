@@ -894,7 +894,7 @@ const downloadArtifact = async (client, artifact) => {
     // make all directories
     core.debug(`Destination directory = ${config.resolvedPath}`);
 
-    fs.mkdirSync(dir, { recursive: true });    
+    fs.mkdirSync(config.resolvedPath, { recursive: true });    
 
     const adm = new AdmZip(Buffer.from(zip.data));
     adm.getEntries().forEach((entry) => {
