@@ -544,7 +544,7 @@ const core = __webpack_require__(310);
 const github = __webpack_require__(462);
 const config = __webpack_require__(673);
 const fs = __webpack_require__(747);
-const http = __webpack_require__(605);
+const http = __webpack_require__(211);
 //const ungzip = require('unzip');
 
 const ArtifactStatus = {
