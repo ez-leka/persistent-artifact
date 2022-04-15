@@ -58,7 +58,7 @@ const downloadArtifact = async (client, artifact) => {
     //     })
     // });
 
-    const url = client(client.rest.actions.downloadArtifact,{
+    const url = await client.paginate(client.rest.actions.downloadArtifact, {
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         artifact_id: artifact.id,
