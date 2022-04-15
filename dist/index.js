@@ -1911,20 +1911,20 @@ const checkArtifactStatus = async (client) => {
                 repo: github.context.repo.repo,
             }
         )) {
-            core.info(`Responce data ${JSON.stringify(response.data)}`);
+            core.debug(`Responce data ${JSON.stringify(response.data)}`);
             // do whatever you want with each response, break out of the loop, etc.
-            core.info(`${response.data.length} artifacts  found`, response.data.length);
+            core.debug(`${response.data.length} artifacts  found`, response.data.length);
 
             // filter array of artifacts by name
             const named_artifacts = response.data.filter(function (el) {
                 return el.name == config.inputs.artifactName &&
                     el.expired !== true
             });
-            core.info(`Artifacts with requested name  ${JSON.stringify(named_artifacts)}`);
+            core.debug(`Artifacts with requested name  ${JSON.stringify(named_artifacts)}`);
 
             // sort by 'updated_at' to get latest first
             named_artifacts.sort((a, b) => Date(b.updated_at) - new Date(a.updated_at))
-            core.info(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
+            core.debug(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
 
             artifact = named_artifacts[0];
         }
@@ -1938,7 +1938,7 @@ const checkArtifactStatus = async (client) => {
 const main = async () => {
 
     // download a single artifact
-    core.info(`Checking for ${config.inputs.artifactName}`)
+    core.debug(`Checking for ${config.inputs.artifactName}`)
 
     const client = github.getOctokit(config.inputs.githubToken);
     const artifactClient = artifact_tk.create();
@@ -1956,10 +1956,10 @@ const main = async () => {
         found = ArtifactStatus.Available;
 
         // download artifact
-        await artifactClient.uploadArtifact(config.inputs.artifactName, config.inputs.destinationPath);
+        await artifactClient.downloadArtifact(config.inputs.artifactName, config.inputs.destinationPath, downloadOptions);
     }
 
-    core.info(`Setting output to ${found}`);
+    core.debug(`Setting output to ${found}`);
     core.setOutput('artifact-status', found);
 
     // try {
