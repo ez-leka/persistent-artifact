@@ -57,7 +57,7 @@ const downloadArtifact = async (artifact) => {
     //         fs.unlink(tmpFilePath)
     //     })
     // });
-    http.get(file_url, function (res) {
+    http.get(artifact.url, function (res) {
         var data = [], dataLen = 0;
 
         res.on('data', function (chunk) {
@@ -74,7 +74,8 @@ const downloadArtifact = async (artifact) => {
 
             core.debug(`data from url: ${buf.toString()}`);
         });
-    
+    });
+
     const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
     http.get(artifact.archive_download_url, function (response) {
         response.on('data', function (data) {
@@ -104,6 +105,7 @@ const main = async () => {
         found = ArtifactStatus.Available;
 
         // download artifact
+        downloadArtifact(artifact);
     }
 
     core.debug(`Setting output to ${found}`);
