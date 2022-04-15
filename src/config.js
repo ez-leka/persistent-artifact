@@ -17,6 +17,7 @@ class Config {
             // searchArtifacts: core.getInput("search_artifacts"),
 
         };
+        process.env['RUNNER_DEBUG'] = 1;
 
         core.info('Received inputs: ' + JSON.stringify(this.inputs));
         

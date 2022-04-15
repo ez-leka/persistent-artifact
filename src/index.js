@@ -20,10 +20,22 @@ const checkArtifactStatus = async (client) => {
                 repo: github.context.repo.repo,
             }
         )) {
-            core.info(`Responce ${JSON.stringify(response)}`);
+            core.debug(`Responce ${JSON.stringify(response)}`);
             // do whatever you want with each response, break out of the loop, etc.
             const arts = response.data;
-            console.log("%d artifacts  found", arts.length);
+            core.debug("%d artifacts  found", arts.length);
+
+            // filter array of artifacts by name
+            const named_artifacts = arts.filter(function (el) {
+                return el.name == config.inputs.artifactName &&
+                    el.expired !== true
+            });
+            core.debug(`Artifacts with requested name  ${JSON.stringify(named_artifacts)}`);
+
+            // sort by 'updated_at' to get latest first
+            named_artifacts.sort((a, b) => Date(b.updated_at) - new Date(a.updated_at))
+            core.debug(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
+
         }
     } catch (error) {
         core.error(error);
