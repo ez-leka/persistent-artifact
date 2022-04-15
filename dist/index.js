@@ -587,7 +587,7 @@ const checkArtifactStatus = async (client) => {
     return artifact;
 }
 
-const downloadArtifact = async (artifact) => {
+const downloadArtifact = async (client, artifact) => {
     // const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
     // http.get(artifact.archive_download_url, function (response) {
     //     response.on('data', function (data) {
@@ -599,7 +599,16 @@ const downloadArtifact = async (artifact) => {
     //         fs.unlink(tmpFilePath)
     //     })
     // });
-    http.get(artifact.url, function (res) {
+
+    const url = client(client.rest.actions.downloadArtifact,{
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        artifact_id: artifact.id,
+        archive_format: 'zip'
+    });
+    core.debug(`Received dowload URL = ${url}`);
+
+    http.get(url, function (res) {
         var data = [], dataLen = 0;
 
         res.on('data', function (chunk) {
@@ -618,12 +627,12 @@ const downloadArtifact = async (artifact) => {
         });
     });
 
-    const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
-    http.get(artifact.archive_download_url, function (response) {
-        response.on('data', function (data) {
-            fs.appendFileSync(tmpFilePath, data)
-        });
-    });
+    // const tmpFilePath = `${config.resolvedPath}/${config.inputs.artifactName}.zip`;
+    // http.get(artifact.archive_download_url, function (response) {
+    //     response.on('data', function (data) {
+    //         fs.appendFileSync(tmpFilePath, data)
+    //     });
+    // });
 }
 
 const main = async () => {
@@ -646,7 +655,7 @@ const main = async () => {
         found = ArtifactStatus.Available;
 
         // download artifact
-        downloadArtifact(artifact);
+        downloadArtifact(client, artifact);
     }
 
     core.debug(`Setting output to ${found}`);
