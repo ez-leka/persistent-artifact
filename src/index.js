@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const artifact = require('@actions/artifact');
+//const artifact = require('@actions/artifact');
 const config = require('./config');
 const http = require('http');
 const fs = require('fs');
@@ -52,7 +52,7 @@ const main = async () => {
     core.info(`Checking for ${config.inputs.artifactName}`)
 
     const client = github.getOctokit(config.inputs.githubToken);
-    const artifactClient = artifact.create();
+    //const artifactClient = artifact.create();
 
     const downloadOptions = {
         createArtifactFolder: false
