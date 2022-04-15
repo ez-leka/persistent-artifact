@@ -1904,16 +1904,17 @@ const checkArtifactStatus = async (client) => {
 
     let found = ArtifactStatus.NotFound;
     try {
-        const responce = client.paginate.iterator(
+        for await (const response of client.paginate.iterator(
             client.rest.actions.listArtifactsForRepo,
             {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
             }
-        );
-        core.info(`Responce ${JSON.stringify(responce)}`);
-        for (const artifact of responce.data) {
-            core.info(`Artifact: ${JSON.stringify(artifact)}`);
+        )) {
+            core.info(`Responce ${JSON.stringify(response)}`);
+            // do whatever you want with each response, break out of the loop, etc.
+            const arts = response.data;
+            console.log("%d artifacts  found", arts.length);
         }
     } catch (error) {
         core.error(error);
