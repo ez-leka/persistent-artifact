@@ -606,7 +606,7 @@ const downloadArtifact = async (client, artifact) => {
         artifact_id: artifact.id,
         archive_format: 'zip'
     });
-    core.debug(`Received dowload URL = ${url.toString()}`);
+    core.debug(`Received dowload URL = ${String.fromCharCode.apply(null, new Uint8Array(url))}`);
 
     // http.get(url, function (res) {
     //     var data = [], dataLen = 0;
