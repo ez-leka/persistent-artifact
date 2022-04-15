@@ -564,7 +564,7 @@ const checkArtifactStatus = async (client) => {
                 repo: github.context.repo.repo,
             }
         )) {
-            core.info(`Responce ${JSON.stringify(response)}`);
+            core.info(`Responce data ${JSON.stringify(response.data)}`);
             // do whatever you want with each response, break out of the loop, etc.
             const arts = response.data;
             core.info("%d artifacts  found", arts.length);
@@ -602,7 +602,7 @@ const main = async () => {
 
     let found = ArtifactStatus.NotFound;
 
-    const artifact = checkArtifactStatus(client);
+    const artifact = await checkArtifactStatus(client);
 
     core.info(`Artifact to download: ${JSON.stringify(artifact)}`);
     if (artifact != null) {
