@@ -1,9 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-//const artifact_tk = require('@actions/artifact');
+const artifact_tk = require('@actions/artifact');
 const config = require('./config');
-const http = require('http');
-const fs = require('fs');
 
 const ArtifactStatus = {
     Available: 'available',
@@ -24,7 +22,7 @@ const checkArtifactStatus = async (client) => {
         )) {
             core.info(`Responce data ${JSON.stringify(response.data)}`);
             // do whatever you want with each response, break out of the loop, etc.
-            core.info("%d artifacts  found", response.data.length);
+            core.info(`${response.data.length} artifacts  found`, response.data.length);
 
             // filter array of artifacts by name
             const named_artifacts = response.data.filter(function (el) {
@@ -45,13 +43,14 @@ const checkArtifactStatus = async (client) => {
     return artifact;
 }
 
+
 const main = async () => {
 
     // download a single artifact
     core.info(`Checking for ${config.inputs.artifactName}`)
 
     const client = github.getOctokit(config.inputs.githubToken);
-    //const artifactClient = artifact_tk.create();
+    const artifactClient = artifact_tk.create();
 
     const downloadOptions = {
         createArtifactFolder: false
@@ -65,6 +64,8 @@ const main = async () => {
     if (artifact != null) {
         found = ArtifactStatus.Available;
 
+        // download artifact
+        await artifactClient.uploadArtifact(config.inputs.artifactName, config.inputs.destinationPath);
     }
 
     core.info(`Setting output to ${found}`);
