@@ -2276,12 +2276,14 @@ const main = async () => {
         // download artifact
         downloadArtifact(client, artifact);
 
-        // upload it back to make persistant past max days
-        const artifactClient = artifact_mod.create();
-
-        core.debug(`Files to re-upload ${JSON.stringify(files)}`);
-
         // TODO - re-apload to make persistant
+        // the call above must returnlist of downloaded files withtheir absolute pathes.
+        
+        // upload it back to make persistant past max days
+        // const artifactClient = artifact_mod.create();
+
+        // core.debug(`Files to re-upload ${JSON.stringify(files)}`);
+
         // const uploadOptions = {
         //     continueOnError: false,
         //     retentionDays: 90
