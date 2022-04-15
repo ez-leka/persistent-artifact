@@ -57,8 +57,7 @@ const downloadArtifact = async (client, artifact) => {
     });
   
     // make all directories
-    const dir = config.inputs.artifactName ? config.resolvedPath : pathname.join(config.resolvedPath, config.inputs.artifact.name);
-    core.debug(`Destination directory = ${dir}`);
+    core.debug(`Destination directory = ${config.resolvedPath}`);
 
     fs.mkdirSync(dir, { recursive: true });    
 
