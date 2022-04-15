@@ -2,16 +2,18 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const artifact = require('@actions/artifact');
 const config = require('./config');
+const http = require('http');
+const fs = require('fs');
 
 const ArtifactStatus = {
     Available: 'available',
-    Expired: 'expired',
     NotFound: 'not-found'
 }
 
 const checkArtifactStatus = async (client) => {
 
-    let found = ArtifactStatus.NotFound;
+    let artifact = null;
+
     try {
         for await (const response of client.paginate.iterator(
             client.rest.actions.listArtifactsForRepo,
@@ -20,27 +22,28 @@ const checkArtifactStatus = async (client) => {
                 repo: github.context.repo.repo,
             }
         )) {
-            core.debug(`Responce ${JSON.stringify(response)}`);
+            core.info(`Responce ${JSON.stringify(response)}`);
             // do whatever you want with each response, break out of the loop, etc.
             const arts = response.data;
-            core.debug("%d artifacts  found", arts.length);
+            core.info("%d artifacts  found", arts.length);
 
             // filter array of artifacts by name
             const named_artifacts = arts.filter(function (el) {
                 return el.name == config.inputs.artifactName &&
                     el.expired !== true
             });
-            core.debug(`Artifacts with requested name  ${JSON.stringify(named_artifacts)}`);
+            core.info(`Artifacts with requested name  ${JSON.stringify(named_artifacts)}`);
 
             // sort by 'updated_at' to get latest first
             named_artifacts.sort((a, b) => Date(b.updated_at) - new Date(a.updated_at))
-            core.debug(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
+            core.info(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
 
+            artifact = named_artifacts[0];
         }
     } catch (error) {
         core.error(error);
     }
-    return found;
+    return artifact;
 }
 
 const main = async () => {
@@ -55,67 +58,16 @@ const main = async () => {
         createArtifactFolder: false
     }
 
-    let found = checkArtifactStatus(client);
+    let found = ArtifactStatus.NotFound;
 
+    const artifact = checkArtifactStatus(client);
 
-    // const runs = await client.paginate(client.rest.actions.listWorkflowRuns,
-    //     {
-    //         owner: github.context.repo.owner,
-    //         repo: github.context.repo.repo,
-    //         workflow_id: github.context.sha,
-    //     }
-    // );
-    // core.info(`Runs ${JSON.stringify(runs)}`);
+    core.info(`Artifact to download: ${JSON.stringify(artifact)}`);
+    if (artifact != null) {
+        found = ArtifactStatus.Available;
 
-    // const artifacts = await client.rest.actions.listArtifactsForRepo({
-    //     owner: github.context.repo.owner,
-    //     repo: github.context.repo.repo
-    // });
-    // core.info(`All Artifacts: ${JSON.stringify(artifacts)}`);
+    }
 
-    // for await (const response of client.paginate.iterator(
-    //     client.rest.actions.listArtifactsForRepo,
-    //     {
-    //         owner: github.context.repo.owner,
-    //         repo: github.context.repo.repo,
-    //     }
-    // )) {
-    //     core.info(`Responce ${JSON.stringify(response)}`);
-    //     // for (const artifact of response.data) {
-    //     //     core.info(`Artifact: ${JSON.stringify(artifact)}`);
-    //     // }
-    // }
-
-    // const artifacts = client.paginate(client.rest.actions.listArtifactsForRepo({
-    //     owner: github.context.repo.owner,
-    //     repo: github.context.repo.repo,
-    // }));
-    // core.info(`All Artifacts: ${JSON.stringify(artifacts)}`);
-
-
-    // for(artifact of artifacts){
-    //     core.info(`Artifact: ${JSON.stringify(artifact)}`);
-
-    //     if (artifact.name === config.inputs.artifactName) {
-    //         core.info(`Found`);
-    //         found = ArtifactStatus.Available;
-    //         if (artifact.expired == true) {
-    //             core.info(`     Expired`)
-    //             found = ArtifactStatus.Expired;
-    //         }
-    //         break;
-    //     }
-    // }
-    // core.info(`Downloading now`)
-    // if (found == ArtifactStatus.Available) {
-    //     // artifact is available - download it 
-    //     const downloadResponse = await artifactClient.downloadArtifact(
-    //         config.inputs.artifactName,
-    //         config.resolvedPath,
-    //         downloadOptions);
-
-    //     core.info(`Downloaded Response: ${downloadResponse}`);
-    // }
 
     core.setOutput('artifact-status', found);
 
