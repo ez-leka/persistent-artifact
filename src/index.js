@@ -90,7 +90,6 @@ const main = async () => {
     core.debug(`Checking for ${config.inputs.artifactName}`)
 
     const client = github.getOctokit(config.inputs.githubToken);
-    const artifactClient = artifact_tk.create();
 
     const downloadOptions = {
         createArtifactFolder: false
