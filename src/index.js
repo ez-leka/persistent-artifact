@@ -25,25 +25,20 @@ const checkArtifactStatus = async (client) => {
             }
         );
         core.debug(`Response ${JSON.stringify(response)}`);
+        core.debug(`${responselength} artifacts  found`, response.length);
         
-        // for({
-        //     core.debug(`Responce data ${JSON.stringify(response.data)}`);
-        //     // do whatever you want with each response, break out of the loop, etc.
-        //     core.debug(`${response.data.length} artifacts  found`, response.data.length);
+        // filter array of artifacts by name
+        const named_artifacts = response.data.filter(function (el) {
+            return el.name == config.inputs.artifactName &&
+                el.expired !== true
+        });
+        core.debug(`Artifacts with requested name  ${JSON.stringify(named_artifacts)}`);
 
-        //     // filter array of artifacts by name
-        //     const named_artifacts = response.data.filter(function (el) {
-        //         return el.name == config.inputs.artifactName &&
-        //             el.expired !== true
-        //     });
-        //     core.debug(`Artifacts with requested name  ${JSON.stringify(named_artifacts)}`);
+        // sort by 'updated_at' to get latest first
+        named_artifacts.sort((a, b) => Date(b.updated_at) - new Date(a.updated_at))
+        core.debug(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
 
-        //     // sort by 'updated_at' to get latest first
-        //     named_artifacts.sort((a, b) => Date(b.updated_at) - new Date(a.updated_at))
-        //     core.debug(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
-
-        //     artifact = named_artifacts[0];
-        // }
+        artifact = named_artifacts[0];
     } catch (error) {
         core.error(error);
     }
