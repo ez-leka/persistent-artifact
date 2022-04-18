@@ -110,14 +110,14 @@ const main = async () => {
         };
         let result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
 
-        core.debug(`Deleting old artifact`);
-        // delete prev version to make retrieval fast and consuistent
-        result = await client.actions.deleteArtifact({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            artifact_id: artifact.id
-        });
-        core.debug(`Artifact ${artifact.id} deleted `);
+        // core.debug(`Deleting old artifact`);
+        // // delete prev version to make retrieval fast and consuistent
+        // result = await client.actions.deleteArtifact({
+        //     owner: github.context.repo.owner,
+        //     repo: github.context.repo.repo,
+        //     artifact_id: artifact.id
+        // });
+        // core.debug(`Artifact ${artifact.id} deleted `);
     }
 
     core.debug(`Setting output to ${found}`);
