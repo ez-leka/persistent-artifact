@@ -24,7 +24,7 @@ const checkArtifactStatus = async (client) => {
                 repo: github.context.repo.repo,
             }
         );
-        core.debug(`Response ${JSON.stringify(response)}`);
+        //core.debug(`Response ${JSON.stringify(response)}`);
         core.debug(`${response.length} artifacts  found`);
         
         // filter array of artifacts by name
@@ -111,7 +111,7 @@ const main = async () => {
 
         };
         let result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
-        core.debug(`Upload result ${result}`);
+        core.debug(`Upload result ${JSON.stringify(result)}`);
 
         core.debug(`Deleting old artifact`);
         // delete prev version to make retrieval fast and consuistent

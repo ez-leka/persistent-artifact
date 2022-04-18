@@ -16,6 +16,10 @@ inputs:
     description: >-
     required: false
     default: "./"
+  # delete:
+  #   description: ->
+  #     if specified , ALL artifacts of given name will be deleted
+  #   required: false
 outputs:
   artifact-status:
     description: >-
