@@ -106,8 +106,7 @@ const main = async () => {
         core.debug(`Files to re-upload ${JSON.stringify(files)}`);
 
         const uploadOptions = {
-            continueOnError: false,
-            retentionDays: 90
+            continueOnError: false
         };
         let result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
 
