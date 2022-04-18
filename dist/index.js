@@ -2254,6 +2254,7 @@ const downloadArtifact = async (client, artifact) => {
         core.debug(`       ${action}: ${filepath}`);
 
         if (!entry.isDirectory) {
+            core.debug(`adding file ${filepath}`);
             files.push(filepath);
         }
     })
@@ -2279,7 +2280,7 @@ const main = async () => {
         found = ArtifactStatus.Available;
 
         // download artifact
-        const files = downloadArtifact(client, artifact);
+        const files = await downloadArtifact(client, artifact);
 
         // the call above must return list of downloaded files withtheir absolute pathes.
 
@@ -2296,7 +2297,7 @@ const main = async () => {
 
         core.debug(`Deleting old artifact`);
         // delete prev version to make retrieval fast and consuistent
-        result = client.actions.deleteArtifact({
+        result = await client.actions.deleteArtifact({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
             artifact_id: artifact.id
