@@ -2209,7 +2209,7 @@ const checkArtifactStatus = async (client) => {
             }
         );
         core.debug(`Response ${JSON.stringify(response)}`);
-        core.debug(`${responselength} artifacts  found`, response.length);
+        core.debug(`${response.length} artifacts  found`);
         
         // filter array of artifacts by name
         const named_artifacts = response.data.filter(function (el) {
