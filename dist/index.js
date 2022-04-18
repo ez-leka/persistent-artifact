@@ -2212,7 +2212,7 @@ const checkArtifactStatus = async (client) => {
         core.debug(`${response.length} artifacts  found`);
         
         // filter array of artifacts by name
-        const named_artifacts = response.data.filter(function (el) {
+        const named_artifacts = response.filter(function (el) {
             return el.name == config.inputs.artifactName &&
                 el.expired !== true
         });
