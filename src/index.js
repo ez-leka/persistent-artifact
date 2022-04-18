@@ -106,18 +106,21 @@ const main = async () => {
         core.debug(`Files to re-upload ${JSON.stringify(files)}`);
 
         const uploadOptions = {
-            continueOnError: false
+            continueOnError: true,
+            retentionDays: 0
+
         };
         let result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
+        core.debug(`Upload result ${result}`);
 
-        // core.debug(`Deleting old artifact`);
-        // // delete prev version to make retrieval fast and consuistent
-        // result = await client.actions.deleteArtifact({
-        //     owner: github.context.repo.owner,
-        //     repo: github.context.repo.repo,
-        //     artifact_id: artifact.id
-        // });
-        // core.debug(`Artifact ${artifact.id} deleted `);
+        core.debug(`Deleting old artifact`);
+        // delete prev version to make retrieval fast and consuistent
+        result = await client.actions.deleteArtifact({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            artifact_id: artifact.id
+        });
+        core.debug(`Artifact ${artifact.id} deleted `);
     }
 
     core.debug(`Setting output to ${found}`);
