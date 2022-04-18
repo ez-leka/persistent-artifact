@@ -2231,6 +2231,8 @@ const checkArtifactStatus = async (client) => {
 
 const downloadArtifact = async (client, artifact) => {
 
+    const files = [];
+
     const zip = await client.actions.downloadArtifact({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
@@ -2250,10 +2252,15 @@ const downloadArtifact = async (client, artifact) => {
         const filepath = pathname.join(dir, entry.entryName)
 
         core.debug(`       ${action}: ${filepath}`);
+
+        if (!entry.isDirectory) {
+            files.push(filepath);
+        }
     })
 
     adm.extractAllTo(dir, true);
 
+    return files;
 };
 
 const main = async () => {
@@ -2272,22 +2279,29 @@ const main = async () => {
         found = ArtifactStatus.Available;
 
         // download artifact
-        downloadArtifact(client, artifact);
+        const files = downloadArtifact(client, artifact);
 
-        // TODO - re-apload to make persistant
-        // the call above must returnlist of downloaded files withtheir absolute pathes.
+        // the call above must return list of downloaded files withtheir absolute pathes.
 
-        // upload it back to make persistant past max days
-        // const artifactClient = artifact_mod.create();
+        //upload it back to make persistant past max days
+        const artifactClient = artifact_mod.create();
 
-        // core.debug(`Files to re-upload ${JSON.stringify(files)}`);
+        core.debug(`Files to re-upload ${JSON.stringify(files)}`);
 
-        // const uploadOptions = {
-        //     continueOnError: false,
-        //     retentionDays: 90
-        // };
-        // const result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
+        const uploadOptions = {
+            continueOnError: false,
+            retentionDays: 90
+        };
+        let result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
 
+        core.debug(`Deleting old artifact`);
+        // delete prev version to make retrieval fast and consuistent
+        result = client.actions.deleteArtifact({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            artifact_id: artifact.id
+        });
+        core.debug(`Artifact ${artifact.id} deleted `);
     }
 
     core.debug(`Setting output to ${found}`);
