@@ -2201,14 +2201,14 @@ const checkArtifactStatus = async (client) => {
     let artifact = null;
 
     try {
-        const response = client.paginate(
+        const response = await client.paginate(
             client.rest.actions.listArtifactsForRepo,
             {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
             }
         );
-        core.debug(`Responce ${JSON.stringify(response)}`);
+        core.debug(`Response ${JSON.stringify(response)}`);
         
         // for({
         //     core.debug(`Responce data ${JSON.stringify(response.data)}`);
