@@ -12,14 +12,6 @@ class Config {
             debug: core.getBooleanInput('debug'),
         };
 
-        if (debug == true) {
-            const res = await octokit.actions.createOrUpdateRepoSecret({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                secret_name: ACTIONS_STEP_DEBUG,
-                encrypted_value: encrypted,
-            });            
-        }
         core.info('Received inputs: ' + JSON.stringify(this.inputs));
         
         this.resolvedPath;
