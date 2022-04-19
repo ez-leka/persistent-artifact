@@ -12,7 +12,7 @@ class Config {
             debug: core.getBooleanInput('debug'),
         };
 
-        core.info('Received inputs: ' + JSON.stringify(this.inputs));
+        this.debug('Received inputs: ' + JSON.stringify(this.inputs));
         
         this.resolvedPath;
         // resolve tilde expansions, path.replace only replaces the first occurrence of a pattern
@@ -21,7 +21,17 @@ class Config {
         } else {
             this.resolvedPath = path.resolve(this.inputs.destinationPath);
         }
-        core.info(`Resolved path is ${this.resolvedPath}`);
+        this.debug(`Resolved path is ${this.resolvedPath}`);
+    }
+
+    debug(message) {
+        if (this.debug) {
+            core.info(message);
+        }   
+    }
+
+    info(message) {
+        core.info(message);
     }
 }
 

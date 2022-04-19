@@ -24,19 +24,19 @@ const checkArtifactStatus = async (client) => {
                 repo: github.context.repo.repo,
             }
         );
-        //core.debug(`Response ${JSON.stringify(response)}`);
-        core.debug(`${response.length} artifacts  found`);
+        //config.debug(`Response ${JSON.stringify(response)}`);
+        config.debug(`${response.length} artifacts  found`);
         
         // filter array of artifacts by name
         const named_artifacts = response.filter(function (el) {
             return el.name == config.inputs.artifactName &&
                 el.expired !== true
         });
-        core.debug(`Artifacts with requested name  ${JSON.stringify(named_artifacts)}`);
+        config.debug(`Artifacts with requested name  ${JSON.stringify(named_artifacts)}`);
 
         // sort by 'updated_at' to get latest first
         named_artifacts.sort((a, b) => Date(b.updated_at) - new Date(a.updated_at))
-        core.debug(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
+        config.debug(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
 
         artifact = named_artifacts[0];
     } catch (error) {
@@ -58,7 +58,7 @@ const downloadArtifact = async (client, artifact) => {
   
     const dir = config.resolvedPath;
     // make all directories
-    core.debug(`Destination directory = ${dir}`);
+    config.debug(`Destination directory = ${dir}`);
 
     fs.mkdirSync(dir, { recursive: true });    
 
@@ -67,10 +67,10 @@ const downloadArtifact = async (client, artifact) => {
         const action = entry.isDirectory ? "creating" : "inflating"
         const filepath = pathname.join(dir, entry.entryName)
 
-        core.debug(`       ${action}: ${filepath}`);
+        config.debug(`       ${action}: ${filepath}`);
 
         if (!entry.isDirectory) {
-            core.debug(`adding file ${filepath}`);
+            config.debug(`adding file ${filepath}`);
             files.push(filepath);
         }
     })
@@ -82,17 +82,8 @@ const downloadArtifact = async (client, artifact) => {
 
 const main = async () => {
 
-    if (config.inputs.debug == true) {
-        const res = await octokit.actions.createOrUpdateRepoSecret({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            secret_name: ACTIONS_STEP_DEBUG,
-            encrypted_value: encrypted,
-        });
-    }
-
     // download a single artifact
-    core.debug(`Checking for ${config.inputs.artifactName}`)
+    config.debug(`Checking for ${config.inputs.artifactName}`)
 
     const client = github.getOctokit(config.inputs.githubToken);
 
@@ -100,7 +91,7 @@ const main = async () => {
 
     const artifact = await checkArtifactStatus(client);
 
-    core.debug(`Artifact to download: ${JSON.stringify(artifact)}`);
+    config.debug(`Artifact to download: ${JSON.stringify(artifact)}`);
     if (artifact != null) {
         found = ArtifactStatus.Available;
 
@@ -112,7 +103,7 @@ const main = async () => {
         //upload it back to make persistant past max days
         const artifactClient = artifact_mod.create();
 
-        core.debug(`Files to re-upload ${JSON.stringify(files)}`);
+        config.debug(`Files to re-upload ${JSON.stringify(files)}`);
 
         const uploadOptions = {
             continueOnError: true,
@@ -120,19 +111,19 @@ const main = async () => {
 
         };
         let result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
-        core.debug(`Upload result ${JSON.stringify(result)}`);
+        config.debug(`Upload result ${JSON.stringify(result)}`);
 
-        core.debug(`Deleting old artifact`);
+        config.debug(`Deleting old artifact`);
         // delete prev version to make retrieval fast and consuistent
         result = await client.actions.deleteArtifact({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
             artifact_id: artifact.id
         });
-        core.debug(`Artifact ${artifact.id} deleted `);
+        config.debug(`Artifact ${artifact.id} deleted `);
     }
 
-    core.debug(`Setting output to ${found}`);
+    config.debug(`Setting output to ${found}`);
     core.setOutput('artifact-status', found);
 
 }
