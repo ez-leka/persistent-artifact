@@ -12,6 +12,7 @@ class Config {
             debug: core.getBooleanInput('debug'),
         };
 
+        core.info(`Debug is set to ${this.inputs.debug}`);
         this.debug('Received inputs: ' + JSON.stringify(this.inputs));
         
         this.resolvedPath;
@@ -25,7 +26,7 @@ class Config {
     }
 
     debug(message) {
-        if (this.debug) {
+        if (this.inputs.debug == true) {
             core.info(message);
         }   
     }
