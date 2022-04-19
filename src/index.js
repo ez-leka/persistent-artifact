@@ -107,20 +107,11 @@ const main = async () => {
 
         const uploadOptions = {
             continueOnError: true,
-            retentionDays: 0
+            retentionDays: 0 // use default
 
         };
         let result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
         config.debug(`Upload result ${JSON.stringify(result)}`);
-
-        config.debug(`Deleting old artifact`);
-        // delete prev version to make retrieval fast and consuistent
-        result = await client.actions.deleteArtifact({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            artifact_id: artifact.id
-        });
-        config.debug(`Artifact ${artifact.id} deleted `);
     }
 
     config.debug(`Setting output to ${found}`);
