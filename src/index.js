@@ -112,7 +112,7 @@ const main = async () => {
         };
         config.debug(`Deleting old artifact`);
         // delete prev version to make retrieval fast and consuistent
-        result = await client.actions.deleteArtifact({
+        let result = await client.actions.deleteArtifact({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
             artifact_id: artifact.id
@@ -120,7 +120,7 @@ const main = async () => {
         config.debug(`Artifact ${artifact.id} deleted `);
 
         config.debug(`creating new artifact`);
-        let result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
+        result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
         config.debug(`Upload result ${JSON.stringify(result)}`);
 
     }
