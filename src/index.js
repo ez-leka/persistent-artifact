@@ -82,7 +82,7 @@ const downloadArtifact = async (client, artifact) => {
 
 const main = async () => {
 
-    if (debug == true) {
+    if (config.inputs.debug == true) {
         const res = await octokit.actions.createOrUpdateRepoSecret({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
@@ -90,7 +90,7 @@ const main = async () => {
             encrypted_value: encrypted,
         });
     }
-    
+
     // download a single artifact
     core.debug(`Checking for ${config.inputs.artifactName}`)
 
