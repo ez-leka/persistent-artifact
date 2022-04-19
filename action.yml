@@ -16,10 +16,11 @@ inputs:
     description: >-
     required: false
     default: "./"
-  # delete:
-  #   description: ->
-  #     if specified , ALL artifacts of given name will be deleted
-  #   required: false
+  debug:
+    description: >-
+      set where to run in debug mode 
+    required: false
+    default: 'false'
 outputs:
   artifact-status:
     description: >-

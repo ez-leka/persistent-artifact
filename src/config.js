@@ -8,10 +8,18 @@ class Config {
         this.inputs = {
             githubToken: core.getInput('github-token',{ required: true }),
             artifactName: core.getInput('artifact-name', { required: true }),
-            destinationPath: core.getInput("path", { required: true }),
+            destinationPath: core.getInput('path', { required: true }),
+            debug: core.getBooleanInput('debug'),
         };
-        process.env['RUNNER_DEBUG'] = 1;
 
+        if (debug == true) {
+            const res = await octokit.actions.createOrUpdateRepoSecret({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                secret_name: ACTIONS_STEP_DEBUG,
+                encrypted_value: encrypted,
+            });            
+        }
         core.info('Received inputs: ' + JSON.stringify(this.inputs));
         
         this.resolvedPath;
