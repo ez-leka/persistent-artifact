@@ -18977,12 +18977,17 @@ const main = async () => {
             config.debug(`Upload result ${JSON.stringify(result)}`);
         }
 
-        // delete original artifact so they do not multiply
-        result = await client.actions.deleteArtifact({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            artifact_id: artifact.id
-        });
+        try {
+            // delete original artifact so they do not multiply
+            result = await client.actions.deleteArtifact({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                artifact_id: artifact.id
+            });
+        }
+        catch (error) {
+            config.debug("Error deleting artifact");
+        }
     }
 
     config.debug(`Setting output to ${found}`);
