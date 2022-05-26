@@ -26,7 +26,7 @@ const checkArtifactStatus = async (client) => {
         );
         //config.debug(`Response ${JSON.stringify(response)}`);
         config.debug(`${response.length} artifacts  found`);
-        
+
         // filter array of artifacts by name
         const named_artifacts = response.filter(function (el) {
             return el.name == config.inputs.artifactName &&
@@ -49,34 +49,37 @@ const downloadArtifact = async (client, artifact) => {
 
     const files = [];
 
-    const zip = await client.actions.downloadArtifact({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        artifact_id: artifact.id,
-        archive_format: "zip",
-    });
-  
-    const dir = config.resolvedPath;
-    // make all directories
-    config.debug(`Destination directory = ${dir}`);
+    try {
+        const zip = await client.actions.downloadArtifact({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            artifact_id: artifact.id,
+            archive_format: "zip",
+        });
 
-    fs.mkdirSync(dir, { recursive: true });    
+        const dir = config.resolvedPath;
+        // make all directories
+        config.debug(`Destination directory = ${dir}`);
 
-    const adm = new AdmZip(Buffer.from(zip.data));
-    adm.getEntries().forEach((entry) => {
-        const action = entry.isDirectory ? "creating" : "inflating"
-        const filepath = pathname.join(dir, entry.entryName)
+        fs.mkdirSync(dir, { recursive: true });
 
-        config.debug(`       ${action}: ${filepath}`);
+        const adm = new AdmZip(Buffer.from(zip.data));
+        adm.getEntries().forEach((entry) => {
+            const action = entry.isDirectory ? "creating" : "inflating"
+            const filepath = pathname.join(dir, entry.entryName)
 
-        if (!entry.isDirectory) {
-            config.debug(`adding file ${filepath}`);
-            files.push(filepath);
-        }
-    })
+            config.debug(`       ${action}: ${filepath}`);
 
-    adm.extractAllTo(dir, true);
+            if (!entry.isDirectory) {
+                config.debug(`adding file ${filepath}`);
+                files.push(filepath);
+            }
+        })
 
+        adm.extractAllTo(dir, true);
+    } catch (error) {
+        config.debug("Error downloading artifact");
+    }
     return files;
 };
 
@@ -84,6 +87,8 @@ const main = async () => {
 
     // download a single artifact
     config.debug(`Checking for ${config.inputs.artifactName}`)
+
+    let result;
 
     const client = github.getOctokit(config.inputs.githubToken);
 
@@ -93,26 +98,36 @@ const main = async () => {
 
     config.debug(`Artifact to download: ${JSON.stringify(artifact)}`);
     if (artifact != null) {
-        found = ArtifactStatus.Available;
 
         // download artifact
         const files = await downloadArtifact(client, artifact);
 
         // the call above must return list of downloaded files withtheir absolute pathes.
 
-        //upload it back to make persistant past max days
-        const artifactClient = artifact_mod.create();
+        if (files.length != 0) {
+            found = ArtifactStatus.Available;
 
-        config.debug(`Files to re-upload ${JSON.stringify(files)}`);
+            // if we got here, we have downloaded 
+            //upload it back to make persistant past max days
+            const artifactClient = artifact_mod.create();
 
-        const uploadOptions = {
-            continueOnError: true
-        };
+            config.debug(`Files to re-upload ${JSON.stringify(files)}`);
 
-        config.debug(`updating artifact`);
-        result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
-        config.debug(`Upload result ${JSON.stringify(result)}`);
+            const uploadOptions = {
+                continueOnError: true
+            };
 
+            config.debug(`updating artifact`);
+            result = await artifactClient.uploadArtifact(config.inputs.artifactName, files, config.resolvedPath, uploadOptions);
+            config.debug(`Upload result ${JSON.stringify(result)}`);
+        }
+
+        // delete original artifact so they do not multiply
+        result = await client.actions.deleteArtifact({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            artifact_id: artifact.id
+        });
     }
 
     config.debug(`Setting output to ${found}`);
