@@ -50,12 +50,15 @@ const downloadArtifact = async (client, artifact) => {
     const files = [];
 
     try {
+        config.debug(`Starting download of artifact ${artifact.id}`);
+
         const zip = await client.actions.downloadArtifact({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
             artifact_id: artifact.id,
             archive_format: "zip",
         });
+        config.debug(`Retrived zip = ${zip}`);
 
         const dir = config.resolvedPath;
         // make all directories
@@ -68,7 +71,7 @@ const downloadArtifact = async (client, artifact) => {
             const action = entry.isDirectory ? "creating" : "inflating"
             const filepath = pathname.join(dir, entry.entryName)
 
-            config.debug(`       ${action}: ${filepath}`);
+            config.debug(`${action}: ${filepath}`);
 
             if (!entry.isDirectory) {
                 config.debug(`adding file ${filepath}`);
@@ -78,7 +81,7 @@ const downloadArtifact = async (client, artifact) => {
 
         adm.extractAllTo(dir, true);
     } catch (error) {
-        config.debug("Error downloading artifact");
+        config.debug(`Error downloading artifact: ${error}`);
     }
     return files;
 };
