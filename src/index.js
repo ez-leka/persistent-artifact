@@ -103,7 +103,7 @@ const main = async () => {
 
     const artifacts = await checkArtifactStatus(client);
 
-    config.debug(`Artifact to download: ${JSON.stringify(artifact)}`);
+    // config.debug(`Artifact to download: ${JSON.stringify(artifact)}`);
     if (artifacts != null) {
 
         // download artifact
