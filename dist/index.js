@@ -18937,6 +18937,8 @@ const downloadArtifact = async (client, artifacts) => {
             })
 
             adm.extractAllTo(dir, true);
+            // we succeded, no need to keep trying 
+            break;
         } catch (error) {
             config.debug(`Error downloading artifact ${artifacts[i].id}: ${error} -- trying next one`);
             i++;
