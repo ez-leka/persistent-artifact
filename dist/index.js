@@ -18869,7 +18869,7 @@ const ArtifactStatus = {
 
 const checkArtifactStatus = async (client) => {
 
-    let artifact = null;
+    let artifacts = null;
 
     try {
         const response = await client.paginate(
@@ -18893,50 +18893,54 @@ const checkArtifactStatus = async (client) => {
         named_artifacts.sort((a, b) => Date(b.updated_at) - new Date(a.updated_at))
         config.debug(`Artifacts with requested name sorted descending ${JSON.stringify(named_artifacts)}`);
 
-        artifact = named_artifacts[0];
+        artifacts = named_artifacts;
     } catch (error) {
         core.error(error);
     }
-    return artifact;
+    return artifacts;
 }
 
-const downloadArtifact = async (client, artifact) => {
+const downloadArtifact = async (client, artifacts) => {
 
     const files = [];
+    let i = 0;
 
-    try {
-        config.debug(`Starting download of artifact ${artifact.id}`);
+    while (i < artifacts.length) {
+        try {
+            config.debug(`Starting download of artifact ${artifacts[i].id}`);
 
-        const zip = await client.actions.downloadArtifact({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            artifact_id: artifact.id,
-            archive_format: "zip",
-        });
-        config.debug(`Retrived zip = ${zip}`);
+            const zip = await client.actions.downloadArtifact({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                artifact_id: artifacts[i].id,
+                archive_format: "zip",
+            });
+            config.debug(`Retrived zip = ${zip}`);
 
-        const dir = config.resolvedPath;
-        // make all directories
-        config.debug(`Destination directory = ${dir}`);
+            const dir = config.resolvedPath;
+            // make all directories
+            config.debug(`Destination directory = ${dir}`);
 
-        fs.mkdirSync(dir, { recursive: true });
+            fs.mkdirSync(dir, { recursive: true });
 
-        const adm = new AdmZip(Buffer.from(zip.data));
-        adm.getEntries().forEach((entry) => {
-            const action = entry.isDirectory ? "creating" : "inflating"
-            const filepath = pathname.join(dir, entry.entryName)
+            const adm = new AdmZip(Buffer.from(zip.data));
+            adm.getEntries().forEach((entry) => {
+                const action = entry.isDirectory ? "creating" : "inflating"
+                const filepath = pathname.join(dir, entry.entryName)
 
-            config.debug(`${action}: ${filepath}`);
+                config.debug(`${action}: ${filepath}`);
 
-            if (!entry.isDirectory) {
-                config.debug(`adding file ${filepath}`);
-                files.push(filepath);
-            }
-        })
+                if (!entry.isDirectory) {
+                    config.debug(`adding file ${filepath}`);
+                    files.push(filepath);
+                }
+            })
 
-        adm.extractAllTo(dir, true);
-    } catch (error) {
-        config.debug(`Error downloading artifact: ${error}`);
+            adm.extractAllTo(dir, true);
+        } catch (error) {
+            config.debug(`Error downloading artifact ${artifacts[i].id}: ${error} -- trying next one`);
+            i++;
+        }
     }
     return files;
 };
@@ -18952,13 +18956,13 @@ const main = async () => {
 
     let found = ArtifactStatus.NotFound;
 
-    const artifact = await checkArtifactStatus(client);
+    const artifacts = await checkArtifactStatus(client);
 
     config.debug(`Artifact to download: ${JSON.stringify(artifact)}`);
-    if (artifact != null) {
+    if (artifacts != null) {
 
         // download artifact
-        const files = await downloadArtifact(client, artifact);
+        const files = await downloadArtifact(client, artifacts);
 
         // the call above must return list of downloaded files withtheir absolute pathes.
 
